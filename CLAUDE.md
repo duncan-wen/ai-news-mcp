@@ -1,3 +1,5 @@
+Source URLs, auth, rate limits and quirks: `docs/research/ai-news-sources.md`.
+
 ## Agent skills
 
 ### Issue tracker
