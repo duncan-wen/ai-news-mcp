@@ -4,7 +4,11 @@ Rules for reviewing changes in this repo. Each rule is a judgement call. Anythin
 
 ## Tests go through the MCP tools
 
-Tests call the MCP tools through the MCP SDK's in-memory client (`mcp.Client(server)`) and check only what a client can see. The only test doubles are a fake Fetcher and a controllable Clock, and the store is a real SQLite file. Flag any test that calls a Source adapter, the Store or SQL directly, or that mocks anything other than the Fetcher and the Clock. Why: `docs/adr/0004-single-test-seam-at-the-mcp-tools.md`.
+Tests call the MCP tools through the MCP SDK's in-memory client (`mcp.Client(server)`) and check only what a client can see. The only test doubles are a fake Fetcher and a controllable Clock, and the store is a real SQLite file. A test may also pass its own Source list to `create_server`: that is configuration, not a test double. Flag any test that calls a Source adapter, the Store or SQL directly, or that mocks anything other than the Fetcher and the Clock. Why: `docs/adr/0004-single-test-seam-at-the-mcp-tools.md`.
+
+## Omitted is not empty
+
+A tool's list parameter (for example `categories`, `sources`) means the default when omitted (`None`) and nothing when empty (`[]`). Flag code that treats the two alike, such as `if not categories:` or `categories or ALL`.
 
 ## Name things with the glossary's words
 
