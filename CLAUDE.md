@@ -1,5 +1,7 @@
 Source URLs, auth, rate limits and quirks: `docs/research/ai-news-sources.md`.
 
+Run `scripts/check` (lint, format, types, tests) before committing; CI runs the same script. Making a fixture: `tests/fixtures/README.md`.
+
 ## Agent skills
 
 ### Issue tracker

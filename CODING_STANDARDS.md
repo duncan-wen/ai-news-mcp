@@ -4,7 +4,7 @@ Rules for reviewing changes in this repo. Each rule is a judgement call. Anythin
 
 ## Tests go through the MCP tools
 
-Tests call the MCP tools through FastMCP's in-memory client and check only what a client can see. The only test doubles are a fake Fetcher and a controllable Clock, and the store is a real SQLite file. Flag any test that calls a Source adapter, the Store or SQL directly, or that mocks anything other than the Fetcher and the Clock. Why: `docs/adr/0004-single-test-seam-at-the-mcp-tools.md`.
+Tests call the MCP tools through the MCP SDK's in-memory client (`mcp.Client(server)`) and check only what a client can see. The only test doubles are a fake Fetcher and a controllable Clock, and the store is a real SQLite file. Flag any test that calls a Source adapter, the Store or SQL directly, or that mocks anything other than the Fetcher and the Clock. Why: `docs/adr/0004-single-test-seam-at-the-mcp-tools.md`.
 
 ## Name things with the glossary's words
 
