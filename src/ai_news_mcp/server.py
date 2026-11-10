@@ -110,7 +110,7 @@ def create_server(
         """What's New: Items collected since the last Checkpoint, looking back at most 7 days.
 
         Use when the user asks what's new in AI. Each Category has its own Checkpoint;
-        only the Checkpoints of the Categories asked about (default: all) move to now.
+        only the Checkpoints of the Categories asked about (omitted: all) move to now.
         Categories: News (industry events: launches, funding, policy, people),
         Applications (AI products and tools to use right away), Engineering (how to build
         AI systems: technical posts, frameworks, releases) and Models (new or newly listed
@@ -118,7 +118,8 @@ def create_server(
         Categories.
         """
         now = clock.now()
-        categories = list(dict.fromkeys(categories)) if categories else list(Category)
+        # Omitted means every Category; a repeated Category counts once.
+        categories = list(Category) if categories is None else list(dict.fromkeys(categories))
         oldest = now - WHATS_NEW_LOOKBACK
         checkpoints = store.checkpoints()
         items = store.collected_after(

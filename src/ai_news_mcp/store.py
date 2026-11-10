@@ -80,10 +80,7 @@ class Store:
         return datetime.fromisoformat(value)
 
     def add_items(self, items: list[NewItem]) -> int:
-        """Insert Items whose URL is not stored yet; return how many were added.
-
-        An Item already stored under the same URL gains the new Item's Categories.
-        """
+        """Insert Items whose URL is not stored yet; return how many were added."""
         added = 0
         with self._db:
             for item in items:
@@ -103,13 +100,12 @@ class Store:
                         item.source_id,
                     ),
                 )
-                added += cursor.rowcount
+                if cursor.rowcount == 0:
+                    continue
+                added += 1
                 self._db.executemany(
-                    """
-                    INSERT OR IGNORE INTO item_categories (item_id, category)
-                    SELECT id, ? FROM items WHERE url = ?
-                    """,
-                    [(category.value, item.url) for category in item.categories],
+                    "INSERT INTO item_categories (item_id, category) VALUES (?, ?)",
+                    [(cursor.lastrowid, category.value) for category in item.categories],
                 )
         return added
 
@@ -128,16 +124,16 @@ class Store:
         ).fetchall()
         return self._with_categories(rows)
 
-    def collected_after(self, after: dict[Category, datetime]) -> list[StoredItem]:
+    def collected_after(self, since: dict[Category, datetime]) -> list[StoredItem]:
         """Items in any given Category collected after that Category's time, newest first."""
-        if not after:
+        if not since:
             return []
         conditions = " OR ".join(
-            "(item_categories.category = ? AND items.collected_at > ?)" for _ in after
+            "(item_categories.category = ? AND items.collected_at > ?)" for _ in since
         )
         parameters = [
             value
-            for category, moment in after.items()
+            for category, moment in since.items()
             for value in (category.value, _to_text(moment))
         ]
         rows = self._db.execute(
@@ -182,7 +178,9 @@ class Store:
                 summary=row[3],
                 published_at=datetime.fromisoformat(row[4]),
                 source_id=row[5],
-                categories=tuple(c for c in Category if c in categories[row[0]]),
+                categories=tuple(
+                    category for category in Category if category in categories[row[0]]
+                ),
             )
             for row in rows
         ]

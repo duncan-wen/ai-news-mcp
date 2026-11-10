@@ -120,3 +120,24 @@ async def test_search_does_not_move_any_checkpoint(connect):
         result = await call(client, "whats_new")
 
     assert len(result["items"]) == 6
+
+
+async def test_collecting_does_not_move_any_checkpoint(connect, fetcher, clock):
+    async with connect() as client:
+        await call(client, "collect_now")
+        fetcher.serve(OPENAI_NEWS_URL, "openai_rss_next_day.xml")
+        clock.advance(timedelta(hours=1))
+        await call(client, "collect_now")
+        result = await call(client, "whats_new")
+
+    assert len(result["items"]) == 7
+
+
+async def test_whats_new_for_no_categories_moves_no_checkpoint(connect):
+    async with connect() as client:
+        await call(client, "collect_now")
+        none = await call(client, "whats_new", categories=[])
+        result = await call(client, "whats_new")
+
+    assert none["items"] == []
+    assert len(result["items"]) == 6
