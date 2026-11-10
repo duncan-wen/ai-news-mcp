@@ -6,9 +6,9 @@ import asyncio
 from dataclasses import dataclass
 from datetime import timedelta
 
-from .adapters import parse_rss
+from .adapters import FormatError, parse_rss
 from .clock import Clock
-from .fetcher import Fetcher
+from .fetcher import Fetcher, FetchError
 from .sources import Source
 from .store import NewItem, Store
 from .urls import normalize_url
@@ -21,6 +21,7 @@ STALE_AFTER = timedelta(hours=24)
 class SourceReport:
     source: str
     added: int
+    error: str | None = None
 
 
 class Collector:
@@ -64,17 +65,25 @@ class Collector:
 
     async def _collect_all(self) -> list[SourceReport]:
         reports = [await self._collect_source(source) for source in self._sources]
-        self._store.record_collection(self._clock.now())
+        # When every Source failed (say, the machine is offline) nothing is fresher than
+        # before, so the next whats_new collects again.
+        if any(report.error is None for report in reports):
+            self._store.record_collection(self._clock.now())
         return reports
 
     async def _collect_source(self, source: Source) -> SourceReport:
-        body = await self._fetcher.get(source.url)
+        try:
+            parsed_items = parse_rss(await self._fetcher.get(source.url))
+        except (FetchError, FormatError) as error:
+            # One broken Source must not stop the others.
+            self._store.record_attempt(source.id, self._clock.now(), str(error))
+            return SourceReport(source=source.id, added=0, error=str(error))
         # Read after the fetch: an Item must not be stamped earlier than a Checkpoint
         # that whats_new moved while this request was waiting.
         now = self._clock.now()
         cutoff = self._store.backfill_from(source.id, default=now - BACKFILL)
         new_items: list[NewItem] = []
-        for parsed in parse_rss(body):
+        for parsed in parsed_items:
             published_at = parsed.published_at or now
             if published_at < cutoff:
                 continue
@@ -90,4 +99,6 @@ class Collector:
                     categories=source.default_categories,
                 )
             )
-        return SourceReport(source=source.id, added=self._store.add_items(new_items))
+        added = self._store.add_items(new_items)
+        self._store.record_attempt(source.id, now, error=None)
+        return SourceReport(source=source.id, added=added)

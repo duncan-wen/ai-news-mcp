@@ -28,7 +28,7 @@ async def test_collect_now_during_a_collection_waits_for_it_instead_of_starting_
             fetcher.release()
 
     assert fetcher.requests == [OPENAI_NEWS_URL]
-    assert reports == [{"sources": [{"source": "openai-news", "added": 6}]}] * 2
+    assert reports == [{"sources": [{"source": "openai-news", "added": 6}], "failed": []}] * 2
 
 
 async def test_server_start_collects_in_the_background_when_never_collected(connect, fetcher):

@@ -21,18 +21,24 @@ OPENAI_NEWS_URL = "https://openai.com/news/rss.xml"
 class FakeFetcher:
     """Serves fixture files by URL; any other URL fails like a 404.
 
+    `fail(url, error)` makes a URL raise that error instead, such as a 410 or a timeout.
     `hold()` makes every request wait until `release()`, to keep a collection running.
     """
 
     def __init__(self) -> None:
         self.responses: dict[str, bytes] = {}
+        self.failures: dict[str, FetchError] = {}
         self.requests: list[str] = []
         self.requested = asyncio.Event()
         self._released = asyncio.Event()
         self._released.set()
 
     def serve(self, url: str, fixture: str) -> None:
+        self.failures.pop(url, None)
         self.responses[url] = (FIXTURES / fixture).read_bytes()
+
+    def fail(self, url: str, error: FetchError) -> None:
+        self.failures[url] = error
 
     def hold(self) -> None:
         self._released.clear()
@@ -44,6 +50,8 @@ class FakeFetcher:
         self.requests.append(url)
         self.requested.set()
         await self._released.wait()
+        if url in self.failures:
+            raise self.failures[url]
         if url not in self.responses:
             raise FetchError(f"404 Not Found: {url}")
         return self.responses[url]

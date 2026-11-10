@@ -17,7 +17,7 @@ from .clock import Clock
 from .collector import Collector
 from .fetcher import PROJECT_NAME, VERSION, Fetcher
 from .sources import DEFAULT_SOURCES, Category, Source
-from .store import Store, StoredItem
+from .store import SourceHealth, Store, StoredItem
 
 SEARCH_LIMIT = 20
 WHATS_NEW_LOOKBACK = timedelta(days=7)
@@ -26,6 +26,7 @@ STILL_COLLECTING = (
     "A collection is still running, so these are only the Items collected before it. "
     "Call whats_new again in a minute or two for the rest."
 )
+FAILURES_BEFORE_WARNING = 3
 
 ToolFunction = TypeVar("ToolFunction", bound=Callable[..., Awaitable[Any]])
 
@@ -50,8 +51,41 @@ class SourceCollectReport(BaseModel):
     added: int
 
 
+class SourceFailure(BaseModel):
+    source: str
+    error: str
+
+
 class CollectReport(BaseModel):
     sources: list[SourceCollectReport]
+    failed: list[SourceFailure]
+
+
+class SourceView(BaseModel):
+    id: str
+    name: str
+    default_categories: list[Category]
+    last_attempt_at: datetime | None
+    last_success_at: datetime | None
+    last_error: str | None
+    consecutive_failures: int
+
+    @classmethod
+    def of(cls, source: Source, health: SourceHealth | None) -> SourceView:
+        """`health` is None for a Source never tried yet."""
+        return cls(
+            id=source.id,
+            name=source.name,
+            default_categories=list(source.default_categories),
+            last_attempt_at=health.last_attempt_at if health else None,
+            last_success_at=health.last_success_at if health else None,
+            last_error=health.last_error if health else None,
+            consecutive_failures=health.consecutive_failures if health else 0,
+        )
+
+
+class SourceList(BaseModel):
+    sources: list[SourceView]
 
 
 class ItemView(BaseModel):
@@ -81,8 +115,29 @@ class SearchResult(BaseModel):
 
 
 class WhatsNew(BaseModel):
+    warning: str | None = None  # first, so that a client reads it before the Items
     items: list[ItemView]
     note: str | None = None
+
+
+def failing_sources_warning(
+    sources: tuple[Source, ...], health: dict[str, SourceHealth]
+) -> str | None:
+    """A warning naming every Source that failed 3 or more collections in a row, if any."""
+    failing = [
+        f"{source.name} ({source.id}): failed {state.consecutive_failures} collections in a row, "
+        f"last error: {state.last_error}"
+        for source in sources
+        if (state := health.get(source.id))
+        and state.consecutive_failures >= FAILURES_BEFORE_WARNING
+    ]
+    if not failing:
+        return None
+    return (
+        "Some Sources keep failing, so their Items are missing: "
+        + "; ".join(failing)
+        + ". Call list_sources for details."
+    )
 
 
 def create_server(
@@ -110,10 +165,33 @@ def create_server(
 
     @tool
     async def collect_now() -> CollectReport:
-        """Collect new Items from every Source now and report how many each Source added."""
+        """Collect new Items from every Source now.
+
+        Reports how many Items each Source added (0 for a failed one), and which Sources
+        failed and why.
+        """
         reports = await collector.collect()
         return CollectReport(
-            sources=[SourceCollectReport(source=r.source, added=r.added) for r in reports]
+            sources=[SourceCollectReport(source=r.source, added=r.added) for r in reports],
+            failed=[
+                SourceFailure(source=r.source, error=r.error)
+                for r in reports
+                if r.error is not None
+            ],
+        )
+
+    @tool
+    async def list_sources() -> SourceList:
+        """Every Source with its default Categories and collection state.
+
+        The state is when it was last tried, when it last succeeded, its last error and
+        how many collections in a row it has failed. The last error is kept after a success,
+        so with 0 failures in a row it is from before `last_success_at`. Use it to check
+        which Sources work.
+        """
+        health = store.source_health()
+        return SourceList(
+            sources=[SourceView.of(source, health.get(source.id)) for source in sources]
         )
 
     @tool
@@ -135,7 +213,8 @@ def create_server(
         AI systems: technical posts, frameworks, releases) and Models (new or newly listed
         models and changes to their abilities or prices). An Item can be in several
         Categories. If the data is over 24 hours old this collects first, which can take
-        about a minute; `note` says when the collection was still running.
+        about a minute; `note` says when the collection was still running. `warning` names
+        Sources that failed 3 or more collections in a row: tell the user.
         """
         if collector.is_stale():
             collector.start()
@@ -155,6 +234,10 @@ def create_server(
             {category: max(checkpoints.get(category, oldest), oldest) for category in categories}
         )
         store.move_checkpoints(categories, now)
-        return WhatsNew(items=[ItemView.of(item) for item in items], note=note)
+        return WhatsNew(
+            warning=failing_sources_warning(sources, store.source_health()),
+            items=[ItemView.of(item) for item in items],
+            note=note,
+        )
 
     return server

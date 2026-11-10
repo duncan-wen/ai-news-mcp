@@ -12,6 +12,7 @@ There is no cron job, systemd timer or cloud scheduler. The MCP server starts a 
 
 - The first `whats_new` of the day can take up to about a minute.
 - Collection must be safe to run concurrently with queries, and only one collection may run at a time.
+- A collection in which every Source failed, for example while the machine is offline, does not count: the data stays over 24 hours old, so the next `whats_new` collects again. Each of those attempts counts as one more failure in a row for every Source, so after three `whats_new` calls offline, the warning about failing Sources appears.
 
 ---
 
@@ -31,3 +32,4 @@ There is no cron job, systemd timer or cloud scheduler. The MCP server starts a 
 
 - 每天第一次呼叫 `whats_new` 可能要等一分鐘左右。
 - 收集必須能和查詢同時進行而不出錯，而且同一時間只能有一次收集。
+- 如果一次收集裡每個 Source 都失敗（例如電腦沒有連網），這次收集不算數：資料仍然超過 24 小時沒更新，下一次呼叫 `whats_new` 會再收集一次。每一次這樣的嘗試，都會讓每個 Source 的連續失敗次數加一，所以沒連網時呼叫三次 `whats_new`，就會出現 Source 一直失敗的警告。

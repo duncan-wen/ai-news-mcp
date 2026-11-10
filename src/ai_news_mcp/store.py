@@ -37,6 +37,13 @@ CREATE TABLE IF NOT EXISTS source_state (
     source_id TEXT PRIMARY KEY,
     backfill_from TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS source_health (
+    source_id TEXT PRIMARY KEY,
+    last_attempt_at TEXT NOT NULL,
+    last_success_at TEXT,
+    last_error TEXT,
+    consecutive_failures INTEGER NOT NULL
+);
 """
 
 
@@ -61,6 +68,14 @@ class StoredItem:
     published_at: datetime
     source_id: str
     categories: tuple[Category, ...]
+
+
+@dataclass(frozen=True)
+class SourceHealth:
+    last_attempt_at: datetime
+    last_success_at: datetime | None
+    last_error: str | None
+    consecutive_failures: int
 
 
 class Store:
@@ -94,6 +109,53 @@ class Store:
                 "SELECT backfill_from FROM source_state WHERE source_id = ?", (source_id,)
             ).fetchone()
         return datetime.fromisoformat(value)
+
+    def record_attempt(self, source_id: str, at: datetime, error: str | None) -> None:
+        """Record one collection attempt for a Source: a success when `error` is None.
+
+        A success resets the consecutive failures; the last error is kept for reference.
+        """
+        succeeded = error is None
+        with self._db:
+            self._db.execute(
+                """
+                INSERT INTO source_health
+                    (source_id, last_attempt_at, last_success_at, last_error, consecutive_failures)
+                VALUES (:source_id, :at, :success_at, :error, :failures)
+                ON CONFLICT (source_id) DO UPDATE SET
+                    last_attempt_at = excluded.last_attempt_at,
+                    last_success_at = coalesce(excluded.last_success_at, last_success_at),
+                    last_error = coalesce(excluded.last_error, last_error),
+                    consecutive_failures = CASE
+                        WHEN :succeeded THEN 0 ELSE consecutive_failures + 1 END
+                """,
+                {
+                    "source_id": source_id,
+                    "at": _to_text(at),
+                    "success_at": _to_text(at) if succeeded else None,
+                    "error": error,
+                    "failures": 0 if succeeded else 1,
+                    "succeeded": succeeded,
+                },
+            )
+
+    def source_health(self) -> dict[str, SourceHealth]:
+        """The health of every Source with at least one recorded attempt."""
+        return {
+            source_id: SourceHealth(
+                last_attempt_at=datetime.fromisoformat(attempt),
+                last_success_at=None if success is None else datetime.fromisoformat(success),
+                last_error=error,
+                consecutive_failures=failures,
+            )
+            for source_id, attempt, success, error, failures in self._db.execute(
+                """
+                SELECT source_id, last_attempt_at, last_success_at, last_error,
+                    consecutive_failures
+                FROM source_health
+                """
+            )
+        }
 
     def add_items(self, items: list[NewItem]) -> int:
         """Insert Items whose URL is not stored yet; return how many were added."""

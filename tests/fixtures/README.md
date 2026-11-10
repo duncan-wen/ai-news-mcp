@@ -13,4 +13,5 @@ Making one:
 | File | Source | Downloaded | Notes |
 |---|---|---|---|
 | `openai_rss.xml` | OpenAI News RSS | 2026-11-11 | 8 Items: 6 from 28 Oct to 10 Nov 2026, 2 from June 2026 |
+| `moved_page.html` | none (hand-made) | 2026-11-11 | An HTML page where an RSS document should be: the format error |
 | `openai_rss_next_day.xml` | OpenAI News RSS | 2026-11-11 | 2 Items from `openai_rss.xml` with a tracking query or trailing slash added; 1 Item (9 Nov) not in `openai_rss.xml` |
