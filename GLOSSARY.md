@@ -42,6 +42,6 @@ _Avoid_: Apps, products, tools
 關於怎麼打造 AI 系統的內容，例如技術文章、框架、實作經驗、版本更新。
 _Avoid_: Dev, tech
 
-**Research（研究）**:
-論文、新模型，以及 benchmark 和排行榜的變化。
-_Avoid_: Evolution（進化）, papers, science
+**Models（模型）**:
+新發布或新上架的 AI 模型，以及它們的能力和價格變化。不包含學術論文與理論研究。
+_Avoid_: Research, Evolution（進化）, papers
