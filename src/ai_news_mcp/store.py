@@ -7,6 +7,8 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 
+from .sources import Category
+
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS items (
     id INTEGER PRIMARY KEY,
@@ -17,6 +19,15 @@ CREATE TABLE IF NOT EXISTS items (
     published_at TEXT NOT NULL,
     collected_at TEXT NOT NULL,
     source_id TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS item_categories (
+    item_id INTEGER NOT NULL REFERENCES items (id),
+    category TEXT NOT NULL,
+    PRIMARY KEY (item_id, category)
+);
+CREATE TABLE IF NOT EXISTS checkpoints (
+    category TEXT PRIMARY KEY,
+    at TEXT NOT NULL
 );
 CREATE TABLE IF NOT EXISTS source_state (
     source_id TEXT PRIMARY KEY,
@@ -34,6 +45,7 @@ class NewItem:
     published_at: datetime
     collected_at: datetime
     source_id: str
+    categories: tuple[Category, ...]
 
 
 @dataclass(frozen=True)
@@ -44,6 +56,7 @@ class StoredItem:
     summary: str
     published_at: datetime
     source_id: str
+    categories: tuple[Category, ...]
 
 
 class Store:
@@ -67,16 +80,19 @@ class Store:
         return datetime.fromisoformat(value)
 
     def add_items(self, items: list[NewItem]) -> int:
-        """Insert Items whose URL is not stored yet; return how many were added."""
+        """Insert Items whose URL is not stored yet; return how many were added.
+
+        An Item already stored under the same URL gains the new Item's Categories.
+        """
+        added = 0
         with self._db:
-            before = self._db.total_changes
-            self._db.executemany(
-                """
-                INSERT OR IGNORE INTO items
-                    (url, original_url, title, summary, published_at, collected_at, source_id)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-                """,
-                [
+            for item in items:
+                cursor = self._db.execute(
+                    """
+                    INSERT OR IGNORE INTO items
+                        (url, original_url, title, summary, published_at, collected_at, source_id)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                    """,
                     (
                         item.url,
                         item.original_url,
@@ -85,11 +101,17 @@ class Store:
                         _to_text(item.published_at),
                         _to_text(item.collected_at),
                         item.source_id,
-                    )
-                    for item in items
-                ],
-            )
-            return self._db.total_changes - before
+                    ),
+                )
+                added += cursor.rowcount
+                self._db.executemany(
+                    """
+                    INSERT OR IGNORE INTO item_categories (item_id, category)
+                    SELECT id, ? FROM items WHERE url = ?
+                    """,
+                    [(category.value, item.url) for category in item.categories],
+                )
+        return added
 
     def search(self, query: str, limit: int) -> list[StoredItem]:
         """Items whose title or summary contains query (ASCII case-insensitive), newest first."""
@@ -103,7 +125,55 @@ class Store:
             LIMIT :limit
             """,
             {"pattern": pattern, "limit": limit},
+        ).fetchall()
+        return self._with_categories(rows)
+
+    def collected_after(self, after: dict[Category, datetime]) -> list[StoredItem]:
+        """Items in any given Category collected after that Category's time, newest first."""
+        if not after:
+            return []
+        conditions = " OR ".join(
+            "(item_categories.category = ? AND items.collected_at > ?)" for _ in after
         )
+        parameters = [
+            value
+            for category, moment in after.items()
+            for value in (category.value, _to_text(moment))
+        ]
+        rows = self._db.execute(
+            f"""
+            SELECT DISTINCT items.id, original_url, title, summary, published_at, source_id
+            FROM items JOIN item_categories ON item_categories.item_id = items.id
+            WHERE {conditions}
+            ORDER BY published_at DESC, items.id DESC
+            """,
+            parameters,
+        ).fetchall()
+        return self._with_categories(rows)
+
+    def checkpoints(self) -> dict[Category, datetime]:
+        """The Checkpoint of every Category that has one."""
+        return {
+            Category(category): datetime.fromisoformat(at)
+            for category, at in self._db.execute("SELECT category, at FROM checkpoints")
+        }
+
+    def move_checkpoints(self, categories: list[Category], to: datetime) -> None:
+        with self._db:
+            self._db.executemany(
+                "INSERT OR REPLACE INTO checkpoints (category, at) VALUES (?, ?)",
+                [(category.value, _to_text(to)) for category in categories],
+            )
+
+    def _with_categories(self, rows: list[tuple[int, str, str, str, str, str]]) -> list[StoredItem]:
+        categories: dict[int, set[Category]] = {row[0]: set() for row in rows}
+        if categories:
+            placeholders = ", ".join("?" for _ in categories)
+            for item_id, category in self._db.execute(
+                f"SELECT item_id, category FROM item_categories WHERE item_id IN ({placeholders})",
+                list(categories),
+            ):
+                categories[item_id].add(Category(category))
         return [
             StoredItem(
                 id=row[0],
@@ -112,6 +182,7 @@ class Store:
                 summary=row[3],
                 published_at=datetime.fromisoformat(row[4]),
                 source_id=row[5],
+                categories=tuple(c for c in Category if c in categories[row[0]]),
             )
             for row in rows
         ]

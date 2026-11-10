@@ -51,6 +51,7 @@ class Collector:
                     published_at=published_at,
                     collected_at=now,
                     source_id=source.id,
+                    categories=source.default_categories,
                 )
             )
         return SourceReport(source=source.id, added=self._store.add_items(new_items))

@@ -11,6 +11,7 @@ from mcp import Client
 
 from ai_news_mcp.fetcher import FetchError
 from ai_news_mcp.server import create_server
+from ai_news_mcp.sources import DEFAULT_SOURCES, Source
 
 FIXTURES = Path(__file__).parent / "fixtures"
 OPENAI_NEWS_URL = "https://openai.com/news/rss.xml"
@@ -64,8 +65,10 @@ def connect(tmp_path: Path, fetcher: FakeFetcher, clock: FakeClock) -> Callable[
     """Opens an in-memory MCP client against a server on a temporary store."""
 
     @asynccontextmanager
-    async def _connect() -> AsyncGenerator[Client]:
-        server = create_server(store_path=tmp_path / "store.sqlite3", fetcher=fetcher, clock=clock)
+    async def _connect(sources: tuple[Source, ...] = DEFAULT_SOURCES) -> AsyncGenerator[Client]:
+        server = create_server(
+            store_path=tmp_path / "store.sqlite3", fetcher=fetcher, clock=clock, sources=sources
+        )
         async with Client(server) as client:
             yield client
 
