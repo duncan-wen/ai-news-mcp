@@ -21,12 +21,14 @@ OPENAI_NEWS_URL = "https://openai.com/news/rss.xml"
 class FakeFetcher:
     """Serves fixture files by URL; any other URL fails like a 404.
 
-    `fail(url, error)` makes a URL raise that error instead, such as a 410 or a timeout.
+    A body is served only from a fixture file (`serve`), since parsing is tested only
+    through them. `fail(url, error)` makes a URL raise that error instead, such as a 410 or
+    a timeout; `serve_nothing()` makes every URL fail, as when offline.
     `hold()` makes every request wait until `release()`, to keep a collection running.
     """
 
     def __init__(self) -> None:
-        self.responses: dict[str, bytes] = {}
+        self._responses: dict[str, bytes] = {}
         self.failures: dict[str, FetchError] = {}
         self.requests: list[str] = []
         self.requested = asyncio.Event()
@@ -35,7 +37,10 @@ class FakeFetcher:
 
     def serve(self, url: str, fixture: str) -> None:
         self.failures.pop(url, None)
-        self.responses[url] = (FIXTURES / fixture).read_bytes()
+        self._responses[url] = (FIXTURES / fixture).read_bytes()
+
+    def serve_nothing(self) -> None:
+        self._responses.clear()
 
     def fail(self, url: str, error: FetchError) -> None:
         self.failures[url] = error
@@ -52,9 +57,9 @@ class FakeFetcher:
         await self._released.wait()
         if url in self.failures:
             raise self.failures[url]
-        if url not in self.responses:
+        if url not in self._responses:
             raise FetchError(f"404 Not Found: {url}")
-        return self.responses[url]
+        return self._responses[url]
 
 
 class FakeClock:
@@ -92,7 +97,10 @@ def connect(tmp_path: Path, fetcher: FakeFetcher, clock: FakeClock) -> Callable[
     A server whose store was never collected, or last collected over 24 hours ago, starts
     a collection on connect, before the test's first tool call. `whats_new` waits for it.
     `fetcher.hold()` keeps it running, so a tool call can join it or see what a client
-    gets meanwhile.
+    gets meanwhile. Without `hold()` it may finish before the first tool call: a following
+    `collect_now` then runs a second collection, so assert its `added`, or count
+    `fetcher.requests`, only after a collection the test itself waited for, or after
+    clearing them.
     """
 
     @asynccontextmanager

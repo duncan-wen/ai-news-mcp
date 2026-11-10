@@ -115,7 +115,7 @@ async def test_whats_new_warns_first_about_a_source_failing_3_times_in_a_row_unt
 async def test_a_collection_where_every_source_failed_does_not_count_as_fresh_data(
     connect, fetcher, clock
 ):
-    fetcher.responses.clear()  # offline: every Source fails
+    fetcher.serve_nothing()  # offline: every Source fails
     async with connect() as client:
         await call(client, "collect_now")  # fails
         fetcher.serve(OPENAI_NEWS_URL, "openai_rss.xml")

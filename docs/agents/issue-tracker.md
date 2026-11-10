@@ -11,6 +11,7 @@ Issues and specs for this repo live as GitHub issues. Use the `gh` CLI for all o
 - **Comment on an issue**: `gh issue comment <number> --body "..."`
 - **Apply / remove labels**: `gh issue edit <number> --add-label "..."` / `--remove-label "..."`
 - **Close**: `gh issue close <number> --comment "..."`
+- **Record an open decision**: when implementing forces behaviour the issue doesn't settle (for example, a case that an old failure path used to cover), post it as a comment headed `## Decisions` (`gh issue comment <number>`) before the review starts, and name it in the final report. The Spec reviewer reads issue comments, so it judges the decision instead of flagging it as scope creep.
 
 Infer the repo from `git remote -v`; `gh` does this automatically when run inside a clone.
 

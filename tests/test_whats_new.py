@@ -62,7 +62,7 @@ async def test_whats_new_returns_only_items_collected_since_the_last_whats_new(
 async def test_whats_new_looks_back_at_most_7_days_even_after_a_long_absence(
     connect, fetcher, clock
 ):
-    fetcher.responses.clear()  # every collection fails until the fixture is served
+    fetcher.serve_nothing()  # every collection fails until the fixture is served
     async with connect() as client:
         await call(client, "whats_new")  # 11 Nov: Checkpoint before anything is collected
         fetcher.serve(OPENAI_NEWS_URL, "openai_rss.xml")
