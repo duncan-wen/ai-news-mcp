@@ -1,0 +1,58 @@
+[project]
+name = "ai-news-mcp"
+version = "0.1.0"
+description = "MCP server that collects AI news from many Sources into a local store for Claude to query."
+authors = [
+    { name = "Duncan WEN", email = "lumpa7223@gmail.com" }
+]
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+dependencies = [
+    "feedparser>=6.0.14",
+    "httpx>=0.28.1",
+    "mcp>=2.3.0",
+    "platformdirs>=4.14.5",
+]
+
+[project.scripts]
+ai-news-mcp = "ai_news_mcp:main"
+
+[build-system]
+requires = ["uv_build>=0.11.8,<0.12.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "anyio>=4.16.0",
+    "pyright>=1.1.414",
+    "pytest>=9.2.0",
+    "ruff>=0.17.4",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "TID"]
+
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+# ADR 0002: the server never calls an LLM.
+"anthropic".msg = "The server never calls an LLM (docs/adr/0002-no-llm-in-the-server.md)."
+"openai".msg = "The server never calls an LLM (docs/adr/0002-no-llm-in-the-server.md)."
+"google.genai".msg = "The server never calls an LLM (docs/adr/0002-no-llm-in-the-server.md)."
+"google.generativeai".msg = "The server never calls an LLM (docs/adr/0002-no-llm-in-the-server.md)."
+"mistralai".msg = "The server never calls an LLM (docs/adr/0002-no-llm-in-the-server.md)."
+"cohere".msg = "The server never calls an LLM (docs/adr/0002-no-llm-in-the-server.md)."
+"litellm".msg = "The server never calls an LLM (docs/adr/0002-no-llm-in-the-server.md)."
+
+[tool.pyright]
+include = ["src", "tests"]
+venvPath = "."
+venv = ".venv"
+pythonVersion = "3.11"
+typeCheckingMode = "standard"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

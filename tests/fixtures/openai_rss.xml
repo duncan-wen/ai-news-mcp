@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title><![CDATA[OpenAI News]]></title>
+        <description><![CDATA[The OpenAI blog]]></description>
+        <link>https://openai.com/news</link>
+        <image>
+            <url>https://openai.com/apple-icon.png</url>
+            <title>OpenAI News</title>
+            <link>https://openai.com/news</link>
+        </image>
+        <generator>OpenAI</generator>
+        <lastBuildDate>Tue, 10 Nov 2026 17:38:11 GMT</lastBuildDate>
+        <atom:link href="https://openai.com/news/rss.xml" rel="self" type="application/rss+xml"/>
+        <language><![CDATA[en-US]]></language>
+        <item>
+            <title><![CDATA[Helping caregivers use AI in everyday life]]></title>
+            <description><![CDATA[OpenAI Academy is bringing free, hands-on ChatGPT workshops to caregivers in five U.S. cities, helping them build practical AI skills for everyday life.]]></description>
+            <link>https://openai.com/index/helping-caregivers-use-ai-in-everyday-life</link>
+            <guid isPermaLink="true">https://openai.com/index/helping-caregivers-use-ai-in-everyday-life</guid>
+            <category><![CDATA[Company]]></category>
+            <pubDate>Tue, 10 Nov 2026 12:00:00 GMT</pubDate>
+        </item>
+        <item>
+            <title><![CDATA[Closing the AI guidance gap in education]]></title>
+            <description><![CDATA[New ThinkYoung research and lessons from OpenAI’s EMEA education partnerships on supporting teachers, AI literacy, and independent learning.]]></description>
+            <link>https://openai.com/index/closing-ai-guidance-gap-education</link>
+            <guid isPermaLink="true">https://openai.com/index/closing-ai-guidance-gap-education</guid>
+            <category><![CDATA[Company]]></category>
+            <pubDate>Tue, 10 Nov 2026 09:00:00 GMT</pubDate>
+        </item>
+        <item>
+            <title><![CDATA[Work at the Frontier: AI’s effect on freelance work]]></title>
+            <description><![CDATA[New research from OpenAI and Upwork finds shifting demand for freelance work, new skill combinations, and larger budgets and more hours for AI-related projects.]]></description>
+            <link>https://openai.com/index/ai-effect-on-freelance-work</link>
+            <guid isPermaLink="true">https://openai.com/index/ai-effect-on-freelance-work</guid>
+            <category><![CDATA[Company]]></category>
+            <pubDate>Tue, 10 Nov 2026 07:00:00 GMT</pubDate>
+        </item>
+        <item>
+            <title><![CDATA[ChatGPT Enterprise now available in AWS Marketplace]]></title>
+            <description><![CDATA[ChatGPT Enterprise is now available through AWS Marketplace, helping organizations simplify procurement through existing AWS purchasing and billing relationships.]]></description>
+            <link>https://openai.com/index/chatgpt-enterprise-aws-marketplace</link>
+            <guid isPermaLink="true">https://openai.com/index/chatgpt-enterprise-aws-marketplace</guid>
+            <category><![CDATA[Product]]></category>
+            <pubDate>Mon, 09 Nov 2026 19:00:00 GMT</pubDate>
+        </item>
+        <item>
+            <title><![CDATA[Evernote turns AI-driven discovery into paid subscriptions]]></title>
+            <description><![CDATA[Evernote used ChatGPT Ads to introduce its note-taking app to people working with AI. The team tracked how often free trials led to paid subscriptions.]]></description>
+            <link>https://openai.com/ads/customers/evernote</link>
+            <guid isPermaLink="true">https://openai.com/ads/customers/evernote</guid>
+            <pubDate>Wed, 28 Oct 2026 19:40:49 GMT</pubDate>
+        </item>
+        <item>
+            <title><![CDATA[OpenAI and ServiceNow expand partnership across enterprise workflows]]></title>
+            <description><![CDATA[OpenAI and ServiceNow expand their partnership to bring OpenAI models and agents into ServiceNow and ServiceNow workflows into ChatGPT and Codex.]]></description>
+            <link>https://openai.com/index/openai-servicenow-partnership-expansion</link>
+            <guid isPermaLink="true">https://openai.com/index/openai-servicenow-partnership-expansion</guid>
+            <category><![CDATA[Company]]></category>
+            <pubDate>Wed, 28 Oct 2026 13:15:00 GMT</pubDate>
+        </item>
+        <item>
+            <title><![CDATA[Introducing LifeSciBench]]></title>
+            <description><![CDATA[Introducing LifeSciBench, an expert-authored, expert-reviewed benchmark for evaluating how AI systems handle real-world life science research tasks and decisions.]]></description>
+            <link>https://openai.com/index/introducing-life-sci-bench</link>
+            <guid isPermaLink="true">https://openai.com/index/introducing-life-sci-bench</guid>
+            <category><![CDATA[Research]]></category>
+            <pubDate>Wed, 17 Jun 2026 00:00:00 GMT</pubDate>
+        </item>
+        <item>
+            <title><![CDATA[Predicting model behavior before release by simulating deployment]]></title>
+            <description><![CDATA[OpenAI introduces Deployment Simulation, a method to predict AI model behavior before deployment using real conversation data to improve safety and evaluation accuracy.]]></description>
+            <link>https://openai.com/index/deployment-simulation</link>
+            <guid isPermaLink="true">https://openai.com/index/deployment-simulation</guid>
+            <category><![CDATA[Research]]></category>
+            <pubDate>Tue, 16 Jun 2026 00:00:00 GMT</pubDate>
+        </item>
+    </channel>
+</rss>
