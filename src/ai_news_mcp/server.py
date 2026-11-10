@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import asyncio
 import inspect
-from collections.abc import Awaitable, Callable
+from collections.abc import AsyncGenerator, Awaitable, Callable
+from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, TypeVar
@@ -19,6 +21,11 @@ from .store import Store, StoredItem
 
 SEARCH_LIMIT = 20
 WHATS_NEW_LOOKBACK = timedelta(days=7)
+COLLECTION_WAIT = timedelta(seconds=90)
+STILL_COLLECTING = (
+    "A collection is still running, so these are only the Items collected before it. "
+    "Call whats_new again in a minute or two for the rest."
+)
 
 ToolFunction = TypeVar("ToolFunction", bound=Callable[..., Awaitable[Any]])
 
@@ -75,6 +82,7 @@ class SearchResult(BaseModel):
 
 class WhatsNew(BaseModel):
     items: list[ItemView]
+    note: str | None = None
 
 
 def create_server(
@@ -83,10 +91,21 @@ def create_server(
     fetcher: Fetcher,
     clock: Clock,
     sources: tuple[Source, ...] = DEFAULT_SOURCES,
+    collection_wait: timedelta = COLLECTION_WAIT,
 ) -> MCPServer:
     store = Store(store_path)
     collector = Collector(sources, store, fetcher, clock)
-    server = MCPServer(PROJECT_NAME, version=VERSION)
+
+    @asynccontextmanager
+    async def lifespan(_: MCPServer) -> AsyncGenerator[None]:
+        if collector.is_stale():
+            collector.start()  # in the background: the server answers queries meanwhile
+        try:
+            yield
+        finally:
+            collector.stop()
+
+    server = MCPServer(PROJECT_NAME, version=VERSION, lifespan=lifespan)
     tool = async_tool(server)
 
     @tool
@@ -115,8 +134,18 @@ def create_server(
         Applications (AI products and tools to use right away), Engineering (how to build
         AI systems: technical posts, frameworks, releases) and Models (new or newly listed
         models and changes to their abilities or prices). An Item can be in several
-        Categories.
+        Categories. If the data is over 24 hours old this collects first, which can take
+        about a minute; `note` says when the collection was still running.
         """
+        if collector.is_stale():
+            collector.start()
+        note = None
+        running = collector.running()
+        if running is not None:
+            # A failed collection still leaves the Items already stored to return.
+            done, _ = await asyncio.wait({running}, timeout=collection_wait.total_seconds())
+            if not done:
+                note = STILL_COLLECTING
         now = clock.now()
         # Omitted means every Category; a repeated Category counts once.
         categories = list(Category) if categories is None else list(dict.fromkeys(categories))
@@ -126,6 +155,6 @@ def create_server(
             {category: max(checkpoints.get(category, oldest), oldest) for category in categories}
         )
         store.move_checkpoints(categories, now)
-        return WhatsNew(items=[ItemView.of(item) for item in items])
+        return WhatsNew(items=[ItemView.of(item) for item in items], note=note)
 
     return server

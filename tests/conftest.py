@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 from collections.abc import AsyncGenerator, Callable
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime, timedelta
@@ -18,15 +19,31 @@ OPENAI_NEWS_URL = "https://openai.com/news/rss.xml"
 
 
 class FakeFetcher:
-    """Serves fixture files by URL; any other URL fails like a 404."""
+    """Serves fixture files by URL; any other URL fails like a 404.
+
+    `hold()` makes every request wait until `release()`, to keep a collection running.
+    """
 
     def __init__(self) -> None:
         self.responses: dict[str, bytes] = {}
+        self.requests: list[str] = []
+        self.requested = asyncio.Event()
+        self._released = asyncio.Event()
+        self._released.set()
 
     def serve(self, url: str, fixture: str) -> None:
         self.responses[url] = (FIXTURES / fixture).read_bytes()
 
+    def hold(self) -> None:
+        self._released.clear()
+
+    def release(self) -> None:
+        self._released.set()
+
     async def get(self, url: str) -> bytes:
+        self.requests.append(url)
+        self.requested.set()
+        await self._released.wait()
         if url not in self.responses:
             raise FetchError(f"404 Not Found: {url}")
         return self.responses[url]
@@ -65,9 +82,15 @@ def connect(tmp_path: Path, fetcher: FakeFetcher, clock: FakeClock) -> Callable[
     """Opens an in-memory MCP client against a server on a temporary store."""
 
     @asynccontextmanager
-    async def _connect(sources: tuple[Source, ...] = DEFAULT_SOURCES) -> AsyncGenerator[Client]:
+    async def _connect(
+        sources: tuple[Source, ...] = DEFAULT_SOURCES, **settings: Any
+    ) -> AsyncGenerator[Client]:
         server = create_server(
-            store_path=tmp_path / "store.sqlite3", fetcher=fetcher, clock=clock, sources=sources
+            store_path=tmp_path / "store.sqlite3",
+            fetcher=fetcher,
+            clock=clock,
+            sources=sources,
+            **settings,
         )
         async with Client(server) as client:
             yield client

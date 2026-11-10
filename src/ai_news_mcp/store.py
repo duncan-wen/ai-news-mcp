@@ -29,6 +29,10 @@ CREATE TABLE IF NOT EXISTS checkpoints (
     category TEXT PRIMARY KEY,
     at TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS last_collection (
+    only_row INTEGER PRIMARY KEY CHECK (only_row = 1),
+    finished_at TEXT NOT NULL
+);
 CREATE TABLE IF NOT EXISTS source_state (
     source_id TEXT PRIMARY KEY,
     backfill_from TEXT NOT NULL
@@ -66,6 +70,18 @@ class Store:
         path.parent.mkdir(parents=True, exist_ok=True)
         self._db = sqlite3.connect(path)
         self._db.executescript(SCHEMA)
+
+    def last_collection(self) -> datetime | None:
+        """When the last collection finished, or None if there has never been one."""
+        row = self._db.execute("SELECT finished_at FROM last_collection").fetchone()
+        return None if row is None else datetime.fromisoformat(row[0])
+
+    def record_collection(self, finished_at: datetime) -> None:
+        with self._db:
+            self._db.execute(
+                "INSERT OR REPLACE INTO last_collection (only_row, finished_at) VALUES (1, ?)",
+                (_to_text(finished_at),),
+            )
 
     def backfill_from(self, source_id: str, default: datetime) -> datetime:
         """The earliest publish time collected for a Source, fixed by its first collection."""

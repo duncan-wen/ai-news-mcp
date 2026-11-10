@@ -11,10 +11,10 @@ pytestmark = pytest.mark.anyio
 
 async def test_first_collection_only_keeps_items_published_in_the_last_30_days(connect):
     async with connect() as client:
-        report = await call(client, "collect_now")
+        result = await call(client, "whats_new")  # waits for the start-up collection
 
     # The fixture has 8 Items: 6 from 28 Oct - 10 Nov 2026, 2 from June 2026.
-    assert report["sources"] == [{"source": "openai-news", "added": 6}]
+    assert len(result["items"]) == 6
 
 
 async def test_search_returns_the_matching_item_with_its_details(connect):
