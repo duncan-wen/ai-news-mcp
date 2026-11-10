@@ -79,7 +79,13 @@ def clock() -> FakeClock:
 
 @pytest.fixture
 def connect(tmp_path: Path, fetcher: FakeFetcher, clock: FakeClock) -> Callable[[], Any]:
-    """Opens an in-memory MCP client against a server on a temporary store."""
+    """Opens an in-memory MCP client against a server on a temporary store.
+
+    A server whose store was never collected, or last collected over 24 hours ago, starts
+    a collection on connect, before the test's first tool call. `whats_new` waits for it.
+    `fetcher.hold()` keeps it running, so a tool call can join it or see what a client
+    gets meanwhile.
+    """
 
     @asynccontextmanager
     async def _connect(

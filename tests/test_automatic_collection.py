@@ -24,9 +24,7 @@ async def test_collect_now_during_a_collection_waits_for_it_instead_of_starting_
         async with anyio.create_task_group() as tasks:
             tasks.start_soon(collect_now, client)
             tasks.start_soon(collect_now, client)
-            with anyio.fail_after(1):
-                await fetcher.requested.wait()
-            await anyio.sleep(0.05)
+            await anyio.wait_all_tasks_blocked()  # both calls are waiting on the held request
             fetcher.release()
 
     assert fetcher.requests == [OPENAI_NEWS_URL]
@@ -58,8 +56,7 @@ async def test_server_start_collects_only_when_the_last_collection_is_over_24_ho
     fetcher.requested.clear()
 
     async with connect() as client:
-        with anyio.move_on_after(0.1):
-            await fetcher.requested.wait()
+        await anyio.wait_all_tasks_blocked()  # a start-up collection would have fetched by now
         found = await call(client, "search", query="chatgpt")
 
     assert fetcher.requests == ([OPENAI_NEWS_URL] if collects else [])

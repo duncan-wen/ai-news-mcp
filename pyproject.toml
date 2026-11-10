@@ -27,6 +27,7 @@ dev = [
     "anyio>=4.16.0",
     "pyright>=1.1.414",
     "pytest>=9.2.0",
+    "pytest-timeout>=2.4.0",
     "ruff>=0.17.4",
 ]
 
@@ -56,3 +57,5 @@ typeCheckingMode = "standard"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# A concurrency test whose held Fetcher is never released fails here instead of hanging CI.
+timeout = 10
