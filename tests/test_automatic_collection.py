@@ -41,7 +41,7 @@ async def test_server_start_collects_in_the_background_when_never_collected(conn
         result = await call(client, "whats_new")
 
     assert during["items"] == []  # queries are answered while the collection runs
-    assert len(result["items"]) == 6
+    assert len(result["items"]) == 4  # 4 of its 6 Items published in the last 7 days
     assert fetcher.requests == [OPENAI_NEWS_URL]
 
 
@@ -68,7 +68,7 @@ async def test_whats_new_collects_first_only_when_the_last_collection_is_over_24
     connect, fetcher, clock, hours_later, collects
 ):
     async with connect() as client:
-        await call(client, "whats_new")  # sees the start-up collection's 6 Items
+        await call(client, "whats_new")  # sees the start-up collection's Items
         fetcher.serve(OPENAI_NEWS_URL, "openai_rss_next_day.xml")
         fetcher.requests.clear()
         clock.advance(timedelta(hours=hours_later))
@@ -85,7 +85,7 @@ async def test_whats_new_stops_waiting_for_a_slow_collection_and_says_it_is_stil
     connect, fetcher, clock
 ):
     async with connect() as client:
-        await call(client, "whats_new")  # sees the start-up collection's 6 Items
+        await call(client, "whats_new")  # sees the start-up collection's Items
     fetcher.serve(OPENAI_NEWS_URL, "openai_rss_next_day.xml")
     clock.advance(timedelta(days=2))
     fetcher.hold()

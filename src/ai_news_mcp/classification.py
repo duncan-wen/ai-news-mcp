@@ -62,15 +62,28 @@ def _compile(rules: dict[Category, tuple[str, ...]]) -> dict[Category, re.Patter
 
 _PATTERNS = _compile(RULES)
 _TITLE_PATTERNS = _compile(TITLE_RULES)
-_HTML_TAG = re.compile(r"<[^>]+>")
+# A block tag ends a run of text, so it becomes a space; an inline tag (a link, bold) is
+# dropped, so that "<a>llm</a>, " stays "llm, ".
+_BLOCK_TAG = re.compile(
+    r"</?(?:p|br|hr|div|li|ul|ol|dl|dt|dd|h[1-6]|blockquote|pre|table|tr|td|th|figure|"
+    r"figcaption|section|article|header|footer)\b[^>]*>",
+    re.IGNORECASE,
+)
+_ANY_TAG = re.compile(r"<[^>]+>")
+
+
+def plain_text(summary: str) -> str:
+    """A summary without its HTML: tags dropped, entities decoded, whitespace collapsed."""
+    text = _ANY_TAG.sub("", _BLOCK_TAG.sub(" ", summary))
+    return " ".join(html.unescape(text).split())
 
 
 def keyword_matches(title: str, summary: str) -> dict[Category, list[str]]:
     """The keywords found in the title or summary, by the Category their rules add.
 
-    The summary's HTML tags are dropped and only its first SUMMARY_LEAD characters read.
+    Only the first SUMMARY_LEAD characters of the summary's plain text are read.
     """
-    lead = html.unescape(_HTML_TAG.sub(" ", summary))[:SUMMARY_LEAD]
+    lead = plain_text(summary)[:SUMMARY_LEAD]
     text = f"{title}\n{lead}"
     found: dict[Category, list[str]] = {}
     for patterns, searched in ((_PATTERNS, text), (_TITLE_PATTERNS, title)):

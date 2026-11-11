@@ -18,7 +18,8 @@ def fetcher(fetcher):
 async def test_the_first_version_sources_collect_rss_atom_and_text_plain_responses(connect):
     # Every other Source answers 404 from the fake Fetcher.
     async with connect(DEFAULT_SOURCES) as client:
-        result = await call(client, "whats_new")  # waits for the start-up collection
+        await call(client, "whats_new")  # waits for the start-up collection
+        result = await call(client, "search", limit=100)
 
     collected: dict[str, int] = {}
     for item in result["items"]:

@@ -11,7 +11,8 @@ pytestmark = pytest.mark.anyio
 
 async def test_first_collection_only_keeps_items_published_in_the_last_30_days(connect):
     async with connect() as client:
-        result = await call(client, "whats_new")  # waits for the start-up collection
+        await call(client, "whats_new")  # waits for the start-up collection
+        result = await call(client, "search", limit=100)
 
     # The fixture has 8 Items: 6 from 28 Oct - 10 Nov 2026, 2 from June 2026.
     assert len(result["items"]) == 6

@@ -17,6 +17,7 @@ To see the Items fixtures collect into, with their publish times and Categories 
 | `openai_rss.xml` | OpenAI News RSS | 2026-11-11 | 8 Items: 6 from 28 Oct to 10 Nov 2026, 2 from June 2026 |
 | `moved_page.html` | none (hand-made) | 2026-11-11 | An HTML page where an RSS document should be: the format error |
 | `openai_rss_next_day.xml` | OpenAI News RSS | 2026-11-11 | 2 Items from `openai_rss.xml` with a tracking query or trailing slash added; 1 Item (9 Nov) not in `openai_rss.xml` |
+| `openai_rss_same_times.xml` | OpenAI News RSS | 2026-11-11 | `openai_rss.xml` with 2 hand edits, so that its 4 Items from the last 7 days come in 2 pairs with the same publish time: 10 Nov 09:00 and 10 Nov 07:00 |
 | `mistral_rss.xml` | Mistral News RSS | 2026-11-11 | Served as `text/plain`. 6 Items: 4 from 15 Oct to 5 Nov 2026, 1 from 6 Oct, 1 from Sept 2026 |
 | `verge_atom.xml` | The Verge AI Atom | 2026-11-11 | 5 Items, all 10 Nov 2026, with Atom `<content>` |
 | `verge_item_page.html` | The original page of an Item in `verge_atom.xml` (Gemini 4 Carbon) | 2026-11-11 | Trimmed by `trim_fixture.py`, 391 KB → 71 KB |
@@ -28,3 +29,4 @@ To see the Items fixtures collect into, with their publish times and Categories 
 | `hf_models.json` | Hugging Face models API, trending | 2026-11-11 | A top-level array, pretty-printed. 7 of 100 models: 5 created from 28 Oct to 7 Nov 2026, 1 from July 2026, 1 from Nov 2025; 1 with no `pipeline_tag` |
 | `hf_models_later.json` | Hugging Face models API, trending | 2026-11-11 | `hf_models.json` plus 2 models left out of it, standing in for models that started trending later: 1 created 14 Oct, 1 created 5 Nov |
 | `openrouter_models.json` | OpenRouter models API | 2026-11-11 | Pretty-printed. 7 of 469 models (`total_count` left as downloaded): Claude Fable 5.2 and its `:batch` variant, LFM3-1.7B and its `:free` variant, a `:free` variant listed alone, 1 from 28 Oct, 1 from 1 Sept 2026 |
+| `simon_willison_atom.xml` | Simon Willison Atom | 2026-11-11 | 2 of 30 Items, both with HTML summaries: 1 of 1,562 characters (10 Nov), 1 under 500 once its HTML is dropped (4 Nov) |

@@ -39,9 +39,10 @@ async def test_keywords_in_the_title_or_summary_add_categories_to_the_sources_de
     assert item["categories"] == categories
 
 
-async def test_whats_new_in_models_includes_news_items_that_announce_a_model(connect):
+async def test_models_includes_news_items_that_announce_a_model(connect):
     async with connect(MISTRAL_AND_THE_VERGE) as client:
-        result = await call(client, "whats_new", categories=["Models"])
+        await call(client, "whats_new")  # waits for the start-up collection
+        result = await call(client, "search", categories=["Models"])
 
     assert [item["title"] for item in result["items"]] == [
         "Google releases Gemini 4 Carbon with agent ‘swarm’ feature",

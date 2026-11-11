@@ -126,4 +126,4 @@ async def test_a_collection_where_every_source_failed_does_not_count_as_fresh_da
         result = await call(client, "whats_new")  # collects again: the data is still old
 
     assert fetcher.requests == [OPENAI_NEWS_URL]
-    assert len(result["items"]) == 6
+    assert len(result["items"]) == 4  # 4 of its 6 Items published in the last 7 days

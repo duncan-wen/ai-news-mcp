@@ -30,4 +30,4 @@ async def test_every_source_on_a_host_is_requested_once_the_interval_has_passed(
         report = await call(client, "whats_new")  # waits for the start-up collection
 
     assert sorted(fetcher.requests) == sorted([VLLM.url, TRANSFORMERS.url, OPENAI_NEWS_URL])
-    assert len(report["items"]) == 6
+    assert len(report["items"]) == 4  # 4 of its 6 Items published in the last 7 days

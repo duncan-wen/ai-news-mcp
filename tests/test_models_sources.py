@@ -17,7 +17,8 @@ async def test_hugging_face_models_collects_trending_models_created_in_the_last_
 ):
     fetcher.serve(HUGGING_FACE_MODELS.url, "hf_models.json")
     async with connect((HUGGING_FACE_MODELS,)) as client:
-        result = await call(client, "whats_new")
+        await call(client, "whats_new")  # waits for the start-up collection
+        result = await call(client, "search", limit=100)
 
     # 7 trending models: 2 created over 30 days ago (July 2026, Nov 2025).
     assert {item["url"]: item["published_at"] for item in result["items"]} == {
@@ -44,7 +45,7 @@ async def test_a_model_trending_over_30_days_after_it_was_created_is_not_new(
         fetcher.serve(HUGGING_FACE_MODELS.url, "hf_models_later.json")
         clock.advance(timedelta(days=9))
         report = await call(client, "collect_now")
-        result = await call(client, "whats_new")
+        result = await call(client, "search", query="Underdog-Woof")
 
     assert report["sources"] == [{"source": "hugging-face-models", "added": 1}]
     assert [item["title"] for item in result["items"]] == ["ConwayResearch/Underdog-Woof"]
@@ -58,7 +59,8 @@ async def test_openrouter_collects_models_listed_in_the_last_30_days_once_per_mo
 ):
     fetcher.serve(OPENROUTER_MODELS.url, "openrouter_models.json")
     async with connect((OPENROUTER_MODELS,)) as client:
-        result = await call(client, "whats_new")
+        await call(client, "whats_new")  # waits for the start-up collection
+        result = await call(client, "search", limit=100)
 
     # 7 listings: Claude Fable 5.1 from 1 Sept, and a batch and a free variant listed
     # beside their model.

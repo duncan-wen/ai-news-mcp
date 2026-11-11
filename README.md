@@ -10,7 +10,7 @@ It runs on your machine. It needs no API key, no scheduler and no cloud service,
 
 ## What it does
 
-- **What's New**: everything collected since you last asked, per Category, going back 7 days at most.
+- **What's New**: everything collected since you last asked, per Category, that was published in the last 7 days.
 - **Search**: by text, publish time, Category and Source, over everything collected so far (history is kept, so "last week" works).
 - **Full text**: fetches an Item's original page and extracts the main text when the summary is not enough.
 - **Collection on demand**: when the data is over 24 hours old, the server collects by itself when it starts or when you ask what's new. The first collection reaches back 30 days.
@@ -51,7 +51,7 @@ Other MCP clients start it the same way: the command is `uvx ai-news-mcp`, over 
 
 | Tool | What it does |
 | --- | --- |
-| `whats_new` | Items collected since the last Checkpoint of each Category asked about (all if none), up to 7 days back. Moves those Checkpoints to now. |
+| `whats_new` | Items collected since the last Checkpoint of each Category asked about (all if none) and published in the last 7 days, about 100 at most. Moves those Checkpoints to now. |
 | `search` | Items by text, `since` / `until`, Categories and Source ids; newest first. Never moves a Checkpoint. |
 | `read_item` | The main text of an Item's original page. |
 | `list_sources` | Every Source with its URL, default Categories and collection state. |
@@ -68,7 +68,11 @@ Every Item has one or more Categories. A Source gives its default Categories, an
 | Engineering | Content about how to build AI systems, such as technical posts, frameworks, lessons from practice, and releases. |
 | Models | Newly released or newly listed AI models, and changes to what they can do and what they cost. Academic papers and theory are not included. |
 
-Each Category has its own Checkpoint, so asking only about Models does not mark the day's News as seen. The terms used here are defined in [GLOSSARY.md](https://github.com/duncan-wen/ai-news-mcp/blob/main/GLOSSARY.md).
+Each Category has its own Checkpoint, so asking only about Models does not mark the day's News as seen.
+
+What's New shows each Item once: ask again and it is empty until the next collection brings new Items. To see recent Items again, ask by time instead ("What was published this week?"): Claude then calls `search`, which never moves a Checkpoint. Every client of the server (Claude Code, Claude Desktop, the MCP Inspector) shares one store and one set of Checkpoints, so calling `whats_new` from the Inspector while testing also marks those Items as seen for Claude.
+
+The terms used here are defined in [GLOSSARY.md](https://github.com/duncan-wen/ai-news-mcp/blob/main/GLOSSARY.md).
 
 ## Sources
 

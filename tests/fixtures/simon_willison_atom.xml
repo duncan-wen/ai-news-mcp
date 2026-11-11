@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xml:lang="en-us" xmlns="http://www.w3.org/2005/Atom"><title>Simon Willison's Weblog</title><link href="http://simonwillison.net/" rel="alternate"/><link href="http://simonwillison.net/atom/everything/" rel="self"/><id>http://simonwillison.net/</id><updated>2026-11-10T20:09:44+00:00</updated><author><name>Simon Willison</name></author><entry><title>Quoting Prompting Claude Fable 5.2</title><link href="https://simonwillison.net/2026/Nov/10/prompting-claude-fable-52/" rel="alternate"/><published>2026-11-10T05:34:14+00:00</published><updated>2026-11-10T05:34:14+00:00</updated><id>https://simonwillison.net/2026/Nov/10/prompting-claude-fable-52/</id><summary type="html">
+    &lt;blockquote cite="https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5-2#say-who-owns-the-code"&gt;&lt;p&gt;Claude Fable 5.2 responds closely to what the prompt says about who owns the code it works on. In Anthropic’s testing on small coding tasks, when a prompt said nothing about ownership or presented the code base as someone else’s, the model tended to add to the existing structure, even when that repeated existing code. [...]&lt;/p&gt;
+&lt;p&gt;If you want the model to improve the structure as it works, say that the code is its own:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;code&gt;This codebase is yours: what it's for and how it's built are your call, and you'll keep building on it.&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;In Anthropic’s testing on small coding tasks, the model merged repeated code in about half of the tries with this sentence, and in under a tenth of the tries without it.&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p class="cite"&gt;&amp;mdash; &lt;a href="https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5-2#say-who-owns-the-code"&gt;Prompting Claude Fable 5.2&lt;/a&gt;, Anthropic documentation&lt;/p&gt;
+
+    &lt;p&gt;Tags: &lt;a href="https://simonwillison.net/tags/prompt-engineering"&gt;prompt-engineering&lt;/a&gt;, &lt;a href="https://simonwillison.net/tags/anthropic"&gt;anthropic&lt;/a&gt;, &lt;a href="https://simonwillison.net/tags/generative-ai"&gt;generative-ai&lt;/a&gt;, &lt;a href="https://simonwillison.net/tags/ai"&gt;ai&lt;/a&gt;, &lt;a href="https://simonwillison.net/tags/llms"&gt;llms&lt;/a&gt;, &lt;a href="https://simonwillison.net/tags/claude-mythos-fable"&gt;claude-mythos-fable&lt;/a&gt;&lt;/p&gt;
+
+
+
+</summary><category term="prompt-engineering"/><category term="anthropic"/><category term="generative-ai"/><category term="ai"/><category term="llms"/><category term="claude-mythos-fable"/></entry><entry><title>datasette-llm 0.1a10</title><link href="https://simonwillison.net/2026/Nov/4/datasette-llm/" rel="alternate"/><published>2026-11-04T15:26:02+00:00</published><updated>2026-11-04T15:26:02+00:00</updated><id>https://simonwillison.net/2026/Nov/4/datasette-llm/</id><summary type="html">
+    
+        &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href="https://github.com/datasette/datasette-llm/releases/tag/0.1a10"&gt;datasette-llm 0.1a10&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;Fixes a &lt;a href="https://github.com/datasette/datasette-llm/pull/11"&gt;bug&lt;/a&gt; that affected my &lt;a href="https://agent.datasette.io/"&gt;agent.datasette.io&lt;/a&gt; demo site, where the set of available LLM models was not correctly restricted to just those in the configuration.&lt;/p&gt;
+    
+    
+        &lt;p&gt;Tags: &lt;a href="https://simonwillison.net/tags/llm"&gt;llm&lt;/a&gt;, &lt;a href="https://simonwillison.net/tags/datasette"&gt;datasette&lt;/a&gt;&lt;/p&gt;
+    
+
+</summary><category term="llm"/><category term="datasette"/></entry></feed>

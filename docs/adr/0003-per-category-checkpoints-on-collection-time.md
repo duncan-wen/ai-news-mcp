@@ -10,7 +10,7 @@ The 7-day limit is compared against when an Item was **published**. A first coll
 
 - An Item in two Categories can appear twice: once under each Category's Checkpoint. We prefer an occasional repeat to missing something.
 - An Item collected after the Checkpoint but dated more than 7 days back is not in What's New. Only `search` finds it. This is the cost of keeping backfills out of What's New.
-- `whats_new` returns at most `limit` Items, the most recently published. When there are more, the Checkpoints still move to now, so the Items left out count as seen, and the response says how many were left out. All of them were published in the last 7 days, before the oldest Item shown, so `search` finds them. Not moving the Checkpoints would return the same Items on every call. A paging cursor would need server state for a once-a-day view.
+- `whats_new` returns up to `limit` Items, the most recently published. When there are more, the Checkpoints still move to now, so the Items left out count as seen, and the response says how many were left out. All of them were published in the last 7 days, before the oldest Item shown, so `search` finds them. To keep that true, the cut never splits Items published at the same time: it shows fewer, or more when the newest publish time alone has more than `limit` Items. Not moving the Checkpoints would return the same Items on every call. A paging cursor would need server state for a once-a-day view.
 
 ---
 
@@ -28,4 +28,4 @@ Checkpoint 比較的是 Item **收進來**的時間，不是發布時間。有�
 
 - 屬於兩個 Category 的 Item 可能出現兩次，每個 Category 的 Checkpoint 各一次。偶爾重複，總比漏掉好。
 - 一則在 Checkpoint 之後才收進來、但發布時間標在 7 天以前的 Item，不會出現在 What's New，只能用 `search` 找到。這是讓回溯內容不進 What's New 的代價。
-- `whats_new` 最多回傳 `limit` 則，取發布時間最新的。超過時 Checkpoint 照樣移到現在，所以沒顯示的 Items 視為已看過，回應裡會寫明有幾則沒顯示。它們都是最近 7 天內、比顯示的最舊一則更早發布的，用 `search` 一定找得到。如果不移動 Checkpoint，每次呼叫都會拿到同樣的 Items；分頁游標則要在 server 記住狀態，對每天一次的查看來說太複雜。
+- `whats_new` 回傳大約 `limit` 則，取發布時間最新的。超過時 Checkpoint 照樣移到現在，所以沒顯示的 Items 視為已看過，回應裡會寫明有幾則沒顯示。它們都是最近 7 天內、比顯示的最舊一則更早發布的，用 `search` 一定找得到。為了讓這點成立，截斷時不會把同一個發布時間的 Items 分開：會少顯示幾則；如果最新的那個發布時間就超過 `limit` 則，則多顯示。如果不移動 Checkpoint，每次呼叫都會拿到同樣的 Items；分頁游標則要在 server 記住狀態，對每天一次的查看來說太複雜。

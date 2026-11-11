@@ -277,23 +277,28 @@ class Store:
         ).fetchall()
         return self._with_categories(rows)
 
-    def collected_after(self, since: dict[Category, datetime]) -> list[StoredItem]:
-        """Items in any given Category collected after that Category's time, newest first."""
+    def collected_after(
+        self, since: dict[Category, datetime | None], published_since: datetime
+    ) -> list[StoredItem]:
+        """Items in any given Category collected after that Category's time (None: ever),
+        and published at or after `published_since`; newest first."""
         if not since:
             return []
-        conditions = " OR ".join(
-            "(item_categories.category = ? AND items.collected_at > ?)" for _ in since
-        )
-        parameters = [
-            value
-            for category, moment in since.items()
-            for value in (category.value, _to_text(moment))
-        ]
+        conditions: list[str] = []
+        parameters: list[str] = []
+        for category, moment in since.items():
+            if moment is None:
+                conditions.append("item_categories.category = ?")
+                parameters.append(category.value)
+            else:
+                conditions.append("(item_categories.category = ? AND items.collected_at > ?)")
+                parameters += [category.value, _to_text(moment)]
+        parameters.append(_to_text(published_since))
         rows = self._db.execute(
             f"""
             SELECT DISTINCT items.id, original_url, title, summary, published_at, source_id
             FROM items JOIN item_categories ON item_categories.item_id = items.id
-            WHERE {conditions}
+            WHERE ({" OR ".join(conditions)}) AND published_at >= ?
             ORDER BY published_at DESC, items.id DESC
             """,
             parameters,

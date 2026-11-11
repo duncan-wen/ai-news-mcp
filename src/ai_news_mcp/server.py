@@ -14,6 +14,7 @@ from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
 from pydantic import BaseModel, Field
 
+from .classification import plain_text
 from .clock import Clock
 from .collector import Collector
 from .fetcher import (
@@ -31,6 +32,11 @@ from .store import SourceHealth, Store, StoredItem
 
 SEARCH_LIMIT = 20
 WHATS_NEW_LOOKBACK = timedelta(days=7)
+# About 46,000 characters: under the 50,000 at which Claude Code writes a tool result to a
+# file instead of showing it.
+WHATS_NEW_LIMIT = 100
+# The rest of a summary is one `read_item` away. The tool descriptions say "about 500".
+SHOWN_SUMMARY_LENGTH = 500
 COLLECTION_WAIT = timedelta(seconds=90)
 STILL_COLLECTING = (
     "A collection is still running, so these are only the Items collected before it. "
@@ -117,9 +123,15 @@ class ItemView(BaseModel):
             source=item.source_id,
             categories=list(item.categories),
             published_at=item.published_at,
-            summary=item.summary,
+            summary=shown_summary(item.summary),
             url=item.original_url,
         )
+
+
+def shown_summary(summary: str) -> str:
+    """A summary as a client sees it: plain text, cut to SHOWN_SUMMARY_LENGTH characters."""
+    text = plain_text(summary)
+    return text if len(text) <= SHOWN_SUMMARY_LENGTH else text[:SHOWN_SUMMARY_LENGTH] + "…"
 
 
 class SearchResult(BaseModel):
@@ -135,7 +147,9 @@ class FullText(BaseModel):
 
 class WhatsNew(BaseModel):
     warning: str | None = None  # first, so that a client reads it before the Items
+    previous_checkpoints: dict[Category, datetime | None]
     items: list[ItemView]
+    more: int = 0
     note: str | None = None
 
 
@@ -159,6 +173,20 @@ def failing_sources_warning(
     )
 
 
+def shown_items(items: list[StoredItem], limit: int) -> list[StoredItem]:
+    """The newest `limit` Items (newest first), never splitting Items published at one time.
+
+    The Items left out must all be older than the oldest shown, so that `search` with that
+    time as `until` finds them. Fewer than `limit` are shown when the cut would split a
+    publish time; more when the newest publish time alone has more than `limit` Items.
+    """
+    if len(items) <= limit:
+        return items
+    boundary = items[limit].published_at  # the newest Item left out
+    shown = [item for item in items[:limit] if item.published_at > boundary]
+    return shown or [item for item in items if item.published_at == boundary]
+
+
 def as_utc(moment: datetime | None) -> datetime | None:
     """A time from a client; one without an offset is taken as UTC."""
     if moment is None or moment.tzinfo is not None:
@@ -168,7 +196,8 @@ def as_utc(moment: datetime | None) -> datetime | None:
 
 def unreadable_message(item: StoredItem, reason: str) -> str:
     """The error for an Item whose full text cannot be read: its summary and link instead."""
-    summary = f"Its summary: {item.summary} " if item.summary else "It has no summary. "
+    text = plain_text(item.summary)  # whole: here it stands in for the full text
+    summary = f"Its summary: {text} " if text else "It has no summary. "
     return (
         f"Could not read the full text of Item {item.id}: {reason}. "
         f"{summary}Link: {item.original_url}"
@@ -249,7 +278,9 @@ def create_server(
 
         Use for a question about a subject or time span, such as last week's Engineering
         Items about MCP. Every filter is optional; an omitted one matches every Item.
-        `query`: the title or summary contains it (case-insensitive). `since` / `until`:
+        `query`: the title or the whole summary contains it (case-insensitive); a summary
+        shown is plain text cut to about 500 characters; `read_item` gives the full text.
+        `since` / `until`:
         published at or after `since` and before `until`, ISO 8601; a time without an
         offset, or a date alone (midnight), is UTC. `categories`: in any of them (News,
         Applications, Engineering, Models; see `whats_new`). `sources`: from any of these
@@ -297,13 +328,25 @@ def create_server(
         return FullText(id=item.id, title=item.title, url=item.original_url, text=text)
 
     @tool
-    async def whats_new(categories: list[Category] | None = None) -> WhatsNew:
-        """What's New: Items collected since the last Checkpoint, looking back at most 7 days.
+    async def whats_new(
+        categories: list[Category] | None = None,
+        limit: Annotated[int, Field(ge=1)] = WHATS_NEW_LIMIT,
+    ) -> WhatsNew:
+        """What's New: Items collected since the last Checkpoint and published in the last 7 days.
 
         Use when the user asks what's new in AI, or what's new in some Categories; for a
         subject or a time span use `search` instead. Each Category has its own Checkpoint;
         only the Checkpoints of the Categories asked about (omitted: all) move to now, so
-        Items shown once are not shown again.
+        Items shown once are not shown again. Every client of this server shares the
+        Checkpoints. `previous_checkpoints` gives each asked Category's Checkpoint before this
+        call (null: never viewed). If `items` is empty, tell the user when they last looked
+        and offer `search` for recently published Items.
+
+        Results are newest first, up to `limit` (default 100); Items published at the same
+        time are never split, so a few more or fewer can be shown. `more` counts the Items
+        left out; they count as seen too, so tell the user and offer `search` with the same
+        `categories`, `since` 7 days ago and `until` the oldest shown Item's `published_at`.
+        Summaries are plain text cut to about 500 characters; `read_item` gives the full text.
 
         Categories (an Item can be in several):
         News: Events in the AI industry, such as launches, funding, policy, and people
@@ -330,15 +373,16 @@ def create_server(
         now = clock.now()
         # Omitted means every Category; a repeated Category counts once.
         categories = list(Category) if categories is None else list(dict.fromkeys(categories))
-        oldest = now - WHATS_NEW_LOOKBACK
         checkpoints = store.checkpoints()
-        items = store.collected_after(
-            {category: max(checkpoints.get(category, oldest), oldest) for category in categories}
-        )
+        previous = {category: checkpoints.get(category) for category in categories}
+        items = store.collected_after(previous, published_since=now - WHATS_NEW_LOOKBACK)
+        shown = shown_items(items, limit)
         store.move_checkpoints(categories, now)
         return WhatsNew(
             warning=failing_sources_warning(sources, store.source_health()),
-            items=[ItemView.of(item) for item in items],
+            previous_checkpoints=previous,
+            items=[ItemView.of(item) for item in shown],
+            more=len(items) - len(shown),
             note=note,
         )
 

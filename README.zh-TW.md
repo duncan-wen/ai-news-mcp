@@ -10,7 +10,7 @@
 
 ## 功能
 
-- **What's New（新進內容）**：依 Category 列出你上次查看之後收進的所有內容，最多回看 7 天。
+- **What's New（新進內容）**：依 Category 列出你上次查看之後收進、而且是最近 7 天內發布的所有內容。
 - **搜尋**：依文字、發布時間、Category 和 Source 搜尋所有已收集的內容（歷史會保留，所以「上週」也查得到）。
 - **全文**：摘要不夠時，抓取 Item 的原始網頁並擷取正文。
 - **查詢時才收集**：資料超過 24 小時，server 啟動時或你問有什麼新進內容時，就會自己收集。第一次收集會往回抓 30 天。
@@ -51,7 +51,7 @@ claude mcp add --scope user ai-news -- uv run --directory /path/to/ai-news-mcp a
 
 | Tool | 用途 |
 | --- | --- |
-| `whats_new` | 所問的每個 Category（未指定則全部）自上次 Checkpoint 以來收進的 Items，最多回看 7 天，並把這些 Checkpoint 移到現在。 |
+| `whats_new` | 所問的每個 Category（未指定則全部）自上次 Checkpoint 以來收進、而且是最近 7 天內發布的 Items，大約最多 100 則，並把這些 Checkpoint 移到現在。 |
 | `search` | 依文字、`since` / `until`、Category 和 Source id 搜尋 Items，新的在前。從不移動 Checkpoint。 |
 | `read_item` | Item 原始網頁的正文。 |
 | `list_sources` | 每個 Source 的網址、預設 Category 與收集狀態。 |
@@ -68,7 +68,11 @@ claude mcp add --scope user ai-news -- uv run --directory /path/to/ai-news-mcp a
 | Engineering（工程） | 關於怎麼打造 AI 系統的內容，例如技術文章、框架、實作經驗、版本更新。 |
 | Models（模型） | 新發布或新上架的 AI 模型，以及它們的能力和價格變化。不包含學術論文與理論研究。 |
 
-每個 Category 有自己的 Checkpoint，所以只問 Models 不會讓當天的 News 被當成已看過。這裡用到的名詞定義在 [GLOSSARY.md](https://github.com/duncan-wen/ai-news-mcp/blob/main/GLOSSARY.md)。
+每個 Category 有自己的 Checkpoint，所以只問 Models 不會讓當天的 News 被當成已看過。
+
+What's New 裡的每則 Item 只會出現一次：馬上再問一次會是空的，要等下一次收集收進新的 Items。想再看最近的 Items，就改用時間來問（「這週發布了什麼？」），Claude 會呼叫 `search`，它從不移動 Checkpoint。所有連到這個 server 的 client（Claude Code、Claude Desktop、MCP Inspector）共用同一個 store 和同一組 Checkpoint，所以測試時在 Inspector 呼叫 `whats_new`，這些 Items 對 Claude 來說也算看過了。
+
+這裡用到的名詞定義在 [GLOSSARY.md](https://github.com/duncan-wen/ai-news-mcp/blob/main/GLOSSARY.md)。
 
 ## Sources（來源）
 
