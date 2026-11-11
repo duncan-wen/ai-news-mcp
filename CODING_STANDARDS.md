@@ -4,7 +4,7 @@ Rules for reviewing changes in this repo. Each rule is a judgement call. Anythin
 
 ## Tests go through the MCP tools
 
-Tests call the MCP tools through the MCP SDK's in-memory client (`mcp.Client(server)`) and check only what a client can see. The only test doubles are a fake Fetcher and a controllable Clock, and the store is a real SQLite file. A test may also pass its own settings to `create_server` (the Source list, `collection_wait`): settings with a production default are configuration, not test doubles. Flag any test that calls a Source adapter, the Store or SQL directly, or that mocks anything other than the Fetcher and the Clock. Why: `docs/adr/0004-single-test-seam-at-the-mcp-tools.md`.
+Tests call the MCP tools through the MCP SDK's in-memory client (`mcp.Client(server)`) and check only what a client can see. The only test doubles are a fake Fetcher and a controllable Clock, and the store is a real SQLite file. A test may also pass its own settings to `create_server` (the Source list, `collection_wait`): settings with a production default are configuration, not test doubles. A server that refuses to start has no tool output: such a test asserts the error `create_server` raises, including its message. Flag any test that calls a Source adapter, the Store or SQL directly, or that mocks anything other than the Fetcher and the Clock. Why: `docs/adr/0004-single-test-seam-at-the-mcp-tools.md`.
 
 ## Concurrency tests wait on events
 
