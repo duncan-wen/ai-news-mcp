@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 import time
 
 import pytest
@@ -63,11 +64,14 @@ async def test_search_until_returns_items_published_before_it(connect):
 @pytest.fixture
 def local_time_zone_not_utc(monkeypatch):
     """So that a test can tell UTC from the machine's local time zone."""
-    monkeypatch.setenv("TZ", "Asia/Taipei")
-    time.tzset()
-    yield
-    monkeypatch.undo()
-    time.tzset()
+    if sys.platform == "win32":
+        pytest.skip("time.tzset, which applies a new TZ, is Unix-only")
+    else:
+        monkeypatch.setenv("TZ", "Asia/Taipei")
+        time.tzset()
+        yield
+        monkeypatch.undo()
+        time.tzset()
 
 
 @pytest.mark.usefixtures("local_time_zone_not_utc")
