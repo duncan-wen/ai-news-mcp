@@ -4,7 +4,14 @@ import time
 
 import pytest
 
-from .conftest import OPENAI_NEWS, call, call_error, first_version_source
+from .conftest import (
+    MISTRAL_AND_THE_VERGE,
+    OPENAI_NEWS,
+    call,
+    call_error,
+    first_version_source,
+    serve_mistral_and_the_verge,
+)
 
 pytestmark = pytest.mark.anyio
 
@@ -19,16 +26,9 @@ OPENAI_TITLES = [
 ]
 
 
-# Two News Sources whose keywords add other Categories to some Items.
-MISTRAL_AND_THE_VERGE = (first_version_source("mistral-news"), first_version_source("the-verge-ai"))
-
-
 @pytest.fixture
 def fetcher(fetcher):
-    fetcher.serve("https://mistral.ai/news/rss", "mistral_rss.xml")
-    fetcher.serve(
-        "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml", "verge_atom.xml"
-    )
+    serve_mistral_and_the_verge(fetcher)
     return fetcher
 
 

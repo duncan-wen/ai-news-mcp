@@ -4,18 +4,14 @@ import pytest
 
 from ai_news_mcp.sources import DEFAULT_SOURCES
 
-from .conftest import call
+from .conftest import call, serve_mistral_and_the_verge
 
 pytestmark = pytest.mark.anyio
-
-MISTRAL_NEWS_URL = "https://mistral.ai/news/rss"
-THE_VERGE_AI_URL = "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml"
 
 
 @pytest.fixture
 def fetcher(fetcher):
-    fetcher.serve(MISTRAL_NEWS_URL, "mistral_rss.xml")  # served as text/plain
-    fetcher.serve(THE_VERGE_AI_URL, "verge_atom.xml")
+    serve_mistral_and_the_verge(fetcher)
     return fetcher
 
 

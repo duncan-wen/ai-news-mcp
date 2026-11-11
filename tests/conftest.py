@@ -26,6 +26,15 @@ def first_version_source(source_id: str) -> Source:
 # Most tests collect this one Source; a test of the whole first-version list passes it.
 OPENAI_NEWS = first_version_source("openai-news")
 
+# Two News Sources whose keywords add other Categories to some Items.
+# A test file collecting them overrides `fetcher` to call serve_mistral_and_the_verge.
+MISTRAL_AND_THE_VERGE = (first_version_source("mistral-news"), first_version_source("the-verge-ai"))
+
+
+def serve_mistral_and_the_verge(fetcher: FakeFetcher) -> None:
+    fetcher.serve(MISTRAL_AND_THE_VERGE[0].url, "mistral_rss.xml")  # served as text/plain
+    fetcher.serve(MISTRAL_AND_THE_VERGE[1].url, "verge_atom.xml")
+
 
 class FakeFetcher:
     """Serves fixture files by URL; any other URL fails like a 404.

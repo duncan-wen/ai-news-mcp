@@ -2,20 +2,14 @@ from __future__ import annotations
 
 import pytest
 
-from .conftest import call, first_version_source
+from .conftest import MISTRAL_AND_THE_VERGE, call, serve_mistral_and_the_verge
 
 pytestmark = pytest.mark.anyio
-
-# Two News Sources: their Items start with the News Category only.
-MISTRAL_AND_THE_VERGE = (first_version_source("mistral-news"), first_version_source("the-verge-ai"))
 
 
 @pytest.fixture
 def fetcher(fetcher):
-    fetcher.serve("https://mistral.ai/news/rss", "mistral_rss.xml")
-    fetcher.serve(
-        "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml", "verge_atom.xml"
-    )
+    serve_mistral_and_the_verge(fetcher)
     return fetcher
 
 
