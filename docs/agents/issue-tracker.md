@@ -29,6 +29,14 @@ When set to `yes`, PRs run through the same labels and states as issues, using t
 
 GitHub shares one number space across issues and PRs, so a bare `#42` may be either: resolve with `gh pr view 42` and fall back to `gh issue view 42`.
 
+## Waiting on CI and Dependabot
+
+- **Wait on CI**: `gh pr checks <n> --watch` for a PR, `gh run watch <run-id> --exit-status` for a run. A check still running reports an empty `conclusion`, so a hand-written poll that reads `.conclusion // .status` stops early.
+- **Just pushed**: checks take a few seconds to register, and `--watch` exits at once with "no checks reported" until they do. Retry it until it lists them.
+- **A job that a skipped job feeds**: give its `if:` a status function (`!cancelled() && !failure() && ...`). Without one, the job skips whenever a job in its `needs` chain skipped (publish.yml's `download`).
+- **Merge as each turns green**: Dependabot PRs are independent; merge each when its checks pass rather than waiting on the batch.
+- **Stale base**: `@dependabot rebase` sometimes goes unanswered. Dependabot rebases its open PRs by itself once `main` changes, so merging another PR first usually unsticks it; `@dependabot recreate` is the fallback.
+
 ## When a skill says "publish to the issue tracker"
 
 Create a GitHub issue.

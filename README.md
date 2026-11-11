@@ -198,7 +198,7 @@ This project does not run any service: the server on your machine fetches each S
 
 ```sh
 uv sync
-scripts/check   # lint, format, types and tests, as CI runs them
+scripts/check   # lint, format, types, workflows, tests and the package build, as CI runs them
 scripts/fix     # apply the formatter and lint autofixes
 uv build        # build the sdist and wheel into dist/
 ```
