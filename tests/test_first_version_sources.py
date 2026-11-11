@@ -4,7 +4,7 @@ import pytest
 
 from ai_news_mcp.sources import DEFAULT_SOURCES
 
-from .conftest import call, serve_mistral_and_the_verge
+from .conftest import call, search_collected, serve_mistral_and_the_verge
 
 pytestmark = pytest.mark.anyio
 
@@ -18,8 +18,7 @@ def fetcher(fetcher):
 async def test_the_first_version_sources_collect_rss_atom_and_text_plain_responses(connect):
     # Every other Source answers 404 from the fake Fetcher.
     async with connect(DEFAULT_SOURCES) as client:
-        await call(client, "whats_new")  # waits for the start-up collection
-        result = await call(client, "search", limit=100)
+        result = await search_collected(client)
 
     collected: dict[str, int] = {}
     for item in result["items"]:

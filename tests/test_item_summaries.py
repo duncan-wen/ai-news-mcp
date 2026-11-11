@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from .conftest import call, call_error, first_version_source
+from .conftest import call, call_error, first_version_source, search_collected
 
 pytestmark = pytest.mark.anyio
 
@@ -17,8 +17,7 @@ def fetcher(fetcher):
 
 async def test_a_summary_is_shown_as_plain_text(connect):
     async with connect((SIMON_WILLISON,)) as client:
-        await call(client, "whats_new")  # waits for the start-up collection
-        result = await call(client, "search", query="datasette-llm 0.1a10")
+        result = await search_collected(client, query="datasette-llm 0.1a10")
 
     [item] = result["items"]
     assert item["summary"] == (
@@ -43,16 +42,14 @@ async def test_a_long_summary_is_cut_to_500_characters(connect):
 
 async def test_search_matches_the_whole_summary_not_only_the_part_shown(connect):
     async with connect((SIMON_WILLISON,)) as client:
-        await call(client, "whats_new")  # waits for the start-up collection
-        result = await call(client, "search", query="claude-mythos-fable")  # its last tag
+        result = await search_collected(client, query="claude-mythos-fable")  # its last tag
 
     assert [item["title"] for item in result["items"]] == ["Quoting Prompting Claude Fable 5.2"]
 
 
 async def test_read_item_falls_back_to_the_whole_summary_as_plain_text(connect):
     async with connect((SIMON_WILLISON,)) as client:
-        await call(client, "whats_new")  # waits for the start-up collection
-        [item] = (await call(client, "search", query="Quoting Prompting Claude"))["items"]
+        [item] = (await search_collected(client, query="Quoting Prompting Claude"))["items"]
         error = await call_error(client, "read_item", id=item["id"])  # its page answers 404
 
     assert "Its summary: Claude Fable 5.2 responds closely" in error

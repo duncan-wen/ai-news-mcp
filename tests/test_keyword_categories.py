@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from .conftest import MISTRAL_AND_THE_VERGE, call, serve_mistral_and_the_verge
+from .conftest import MISTRAL_AND_THE_VERGE, search_collected, serve_mistral_and_the_verge
 
 pytestmark = pytest.mark.anyio
 
@@ -32,8 +32,7 @@ async def test_keywords_in_the_title_or_summary_add_categories_to_the_sources_de
     connect, query, categories
 ):
     async with connect(MISTRAL_AND_THE_VERGE) as client:
-        await call(client, "whats_new")  # waits for the start-up collection
-        result = await call(client, "search", query=query)
+        result = await search_collected(client, query=query)
 
     [item] = result["items"]
     assert item["categories"] == categories
@@ -41,8 +40,7 @@ async def test_keywords_in_the_title_or_summary_add_categories_to_the_sources_de
 
 async def test_models_includes_news_items_that_announce_a_model(connect):
     async with connect(MISTRAL_AND_THE_VERGE) as client:
-        await call(client, "whats_new")  # waits for the start-up collection
-        result = await call(client, "search", categories=["Models"])
+        result = await search_collected(client, categories=["Models"])
 
     assert [item["title"] for item in result["items"]] == [
         "Google releases Gemini 4 Carbon with agent ‘swarm’ feature",

@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 
+from ai_news_mcp.server import SHOWN_SUMMARY_LENGTH
 from ai_news_mcp.sources import DEFAULT_SOURCES, Category
 
 from .conftest import call
@@ -77,3 +78,23 @@ async def test_readme_defines_each_category_as_the_glossary_does(language, categ
     definitions = {row[0]: row[1] for row in readme_table(language, "Categories")}
     [definition] = [text for name, text in definitions.items() if name.startswith(category)]
     assert definition == glossary_definitions(category.value)[language]
+
+
+@pytest.mark.parametrize("tool", ["whats_new", "search"])
+async def test_tool_descriptions_give_the_shown_summary_length(connect, tool):
+    async with connect() as client:
+        tools = {tool.name: tool for tool in (await client.list_tools()).tools}
+
+    description = tools[tool].description
+    assert description is not None
+    assert f"about {SHOWN_SUMMARY_LENGTH} characters" in collapse_whitespace(description)
+
+
+@pytest.mark.parametrize("language", READMES)
+async def test_readme_gives_the_whats_new_limit(connect, language):
+    async with connect() as client:
+        tools = {tool.name: tool for tool in (await client.list_tools()).tools}
+
+    limit = tools["whats_new"].input_schema["properties"]["limit"]["default"]
+    [row] = [row for row in readme_table(language, "Tools") if row[0] == "`whats_new`"]
+    assert f" {limit} " in row[1]

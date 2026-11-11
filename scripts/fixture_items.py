@@ -68,6 +68,11 @@ async def main() -> None:
     if arguments.now.tzinfo is None:
         parser.error("--now needs an offset, such as 2026-11-11T12:00:00+00:00")
     pairs: list[tuple[Source, Path]] = arguments.pairs
+    source_ids = [source.id for source, _ in pairs]
+    repeated = sorted({source_id for source_id in source_ids if source_ids.count(source_id) > 1})
+    if repeated:
+        # One URL serves one fixture, so a second fixture would replace the first.
+        parser.error(f"one fixture per Source; run once per fixture of {', '.join(repeated)}")
     with tempfile.TemporaryDirectory() as store_dir:
         server = create_server(
             store_path=Path(store_dir) / "store.sqlite3",
@@ -83,7 +88,10 @@ async def main() -> None:
         print(f"failed: {failure['source']}: {failure['error']}", file=sys.stderr)
     for item in (result.structured_content or {}).get("items", []):
         categories = ",".join(item["categories"])
-        print(f"{item['published_at']}  {item['source']}  [{categories}]  {item['title']}")
+        print(
+            f"{item['published_at']}  {item['source']}  [{categories}]  {item['title']}  "
+            f"{item['url']}"
+        )
 
 
 if __name__ == "__main__":

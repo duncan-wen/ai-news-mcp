@@ -153,6 +153,17 @@ async def call(client: Client, tool: str, **arguments: Any) -> Any:
     return result.structured_content
 
 
+async def search_collected(client: Client, **filters: Any) -> Any:
+    """`search` once the start-up collection is done: what a collection stored.
+
+    Use it to test collection; What's New hides Items published over 7 days ago. It waits
+    by calling `whats_new`, so the Checkpoints move. Without a `limit`, every Item matches.
+    """
+    await call(client, "whats_new")
+    filters.setdefault("limit", 10_000)
+    return await call(client, "search", **filters)
+
+
 async def call_error(client: Client, tool: str, **arguments: Any) -> str:
     """Call a tool that should fail; return the error text a client sees.
 
