@@ -347,5 +347,10 @@ def _named_placeholders(parameters: dict[str, object], prefix: str, values: list
 
 
 def _to_text(moment: datetime) -> str:
-    """UTC ISO 8601, so that text order is time order."""
+    """UTC ISO 8601, so that text order is time order.
+
+    Refuses a time without an offset: `astimezone` would silently take it as local time.
+    """
+    if moment.tzinfo is None:
+        raise ValueError(f"Time without an offset: {moment}")
     return moment.astimezone(UTC).isoformat()
