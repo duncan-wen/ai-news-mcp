@@ -91,6 +91,6 @@ async def test_read_item_cuts_the_text_to_max_length_and_says_so(connect, fetche
 
     assert whole["truncated"] is False
     assert whole["full_length"] == len(whole["text"])
-    assert cut["text"] == whole["text"][:60] + "…"
+    assert cut["text"] == whole["text"][:60]  # no marker: `truncated` says it was cut
     assert cut["truncated"] is True
     assert cut["full_length"] == whole["full_length"]

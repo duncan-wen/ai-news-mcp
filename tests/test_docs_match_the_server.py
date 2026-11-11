@@ -96,6 +96,22 @@ async def test_tool_descriptions_give_the_shown_summary_length(connect, tool):
     assert f"about {SHOWN_SUMMARY_LENGTH} characters" in collapse_whitespace(description)
 
 
+@pytest.mark.parametrize(
+    ("tool", "parameter"), [("search", "summary_length"), ("read_item", "max_length")]
+)
+@pytest.mark.parametrize("language", READMES)
+async def test_readme_and_description_give_each_length_default(connect, language, tool, parameter):
+    async with connect() as client:
+        tools = {tool.name: tool for tool in (await client.list_tools()).tools}
+
+    default = tools[tool].input_schema["properties"][parameter]["default"]
+    [row] = [row for row in readme_table(language, "Tools") if row[0] == f"`{tool}`"]
+    assert f"`{parameter}`" in row[1]
+    assert f"default {default:,}" in row[1] or f"預設 {default:,}" in row[1]
+    description = collapse_whitespace(tools[tool].description or "")
+    assert f"default {default:,}" in description or f"about {default:,} characters" in description
+
+
 @pytest.mark.parametrize("language", READMES)
 async def test_readme_gives_the_whats_new_limit(connect, language):
     async with connect() as client:

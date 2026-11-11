@@ -103,8 +103,8 @@ Every client starts it the same way: the command is `uvx ai-news-mcp`, over stdi
 | Tool | What it does |
 | --- | --- |
 | `whats_new` | Items collected since the last Checkpoint of each Category asked about (all if none) and published in the last 7 days, about 100 at most. Moves those Checkpoints to now. |
-| `search` | Items by text, `since` / `until`, Categories and Source ids; newest first. `summary_length` shortens the summaries shown (0: none). Never moves a Checkpoint. |
-| `read_item` | The main text of an Item's original page, cut to `max_length` characters (default 10,000); the result says whether it was cut. |
+| `search` | Items by text, `since` / `until`, Categories and Source ids; newest first. `summary_length` (default 500) shortens the summaries shown (0: none). Never moves a Checkpoint. |
+| `read_item` | The main text of an Item's original page, cut to `max_length` characters (default 10,000); `truncated` and `full_length` say whether it was cut and how long the whole text is, so a client can ask again with a larger `max_length`. |
 | `list_sources` | Every Source with its URL, default Categories and collection state. |
 | `collect_now` | Collects from every Source now and reports what each added or why it failed. |
 

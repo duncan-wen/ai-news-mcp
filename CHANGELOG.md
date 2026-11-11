@@ -5,7 +5,7 @@ Notable changes in each release. Versions follow [Semantic Versioning](https://s
 ## Unreleased
 
 - `search` takes `summary_length` to shorten the summaries it shows (0: none).
-- `read_item` cuts the text to `max_length` characters (default 10,000) and reports `truncated` and `full_length`.
+- `read_item` returns the first `max_length` characters (default 10,000), with no marker added, and reports `truncated` and `full_length`.
 
 ## 0.1.0
 
