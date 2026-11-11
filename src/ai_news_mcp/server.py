@@ -207,6 +207,8 @@ def create_server(
     async def collect_now() -> CollectReport:
         """Collect new Items from every Source now.
 
+        Use only when the user asks to refresh or collect now: `whats_new` already
+        collects by itself when the data is over 24 hours old. Takes about a minute.
         Reports how many Items each Source added (0 for a failed one), and which Sources
         failed and why.
         """
@@ -298,15 +300,23 @@ def create_server(
     async def whats_new(categories: list[Category] | None = None) -> WhatsNew:
         """What's New: Items collected since the last Checkpoint, looking back at most 7 days.
 
-        Use when the user asks what's new in AI. Each Category has its own Checkpoint;
-        only the Checkpoints of the Categories asked about (omitted: all) move to now.
-        Categories: News (industry events: launches, funding, policy, people),
-        Applications (AI products and tools to use right away), Engineering (how to build
-        AI systems: technical posts, frameworks, releases) and Models (new or newly listed
-        models and changes to their abilities or prices). An Item can be in several
-        Categories. If the data is over 24 hours old this collects first, which can take
-        about a minute; `note` says when the collection was still running. `warning` names
-        Sources that failed 3 or more collections in a row: tell the user.
+        Use when the user asks what's new in AI, or what's new in some Categories; for a
+        subject or a time span use `search` instead. Each Category has its own Checkpoint;
+        only the Checkpoints of the Categories asked about (omitted: all) move to now, so
+        Items shown once are not shown again.
+
+        Categories (an Item can be in several):
+        News: Events in the AI industry, such as launches, funding, policy, and people
+        changes.
+        Applications: New AI products or tools that you can use right away.
+        Engineering: Content about how to build AI systems, such as technical posts,
+        frameworks, lessons from practice, and releases.
+        Models: Newly released or newly listed AI models, and changes to what they can do and
+        what they cost. Academic papers and theory are not included.
+
+        If the data is over 24 hours old this collects first, which can take about a minute;
+        `note` says when the collection was still running. `warning` names Sources that
+        failed 3 or more collections in a row: tell the user.
         """
         if collector.is_stale():
             collector.start()

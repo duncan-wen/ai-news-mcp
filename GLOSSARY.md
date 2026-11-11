@@ -18,6 +18,11 @@ One fixed channel that provides Items, such as an RSS feed or an API endpoint.
 提供 Item 的一個固定管道，例如某個 RSS feed 或某個 API 端點。
 _Avoid_: Feed, site, channel
 
+**Source config file（來源設定檔）**:
+The user's own file, `sources.toml`, that adds Sources, disables built-in Sources, or changes their fields.
+使用者自己的檔案 `sources.toml`，用來新增 Source、停用內建的 Source，或修改它們的欄位。
+_Avoid_: Settings, feed list
+
 ### Viewing（查看）
 
 **What's New（新進內容）**:

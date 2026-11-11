@@ -6,8 +6,19 @@ authors = [
     { name = "Duncan WEN", email = "lumpa7223@gmail.com" }
 ]
 requires-python = ">=3.11"
+readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
+keywords = ["mcp", "model-context-protocol", "claude", "ai-news", "rss"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content :: News/Diary",
+]
 dependencies = [
     "feedparser>=6.0.14",
     "httpx>=0.28.1",
@@ -15,6 +26,11 @@ dependencies = [
     "platformdirs>=4.14.5",
     "trafilatura>=2.3.1",
 ]
+
+[project.urls]
+Homepage = "https://github.com/duncan-wen/ai-news-mcp"
+Repository = "https://github.com/duncan-wen/ai-news-mcp"
+Issues = "https://github.com/duncan-wen/ai-news-mcp/issues"
 
 [project.scripts]
 ai-news-mcp = "ai_news_mcp:main"
