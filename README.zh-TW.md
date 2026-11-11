@@ -196,7 +196,7 @@ url = "https://openai.com/news/rss.xml"
 
 ```sh
 uv sync
-scripts/check   # lint、格式、型別與測試，和 CI 跑的一樣
+scripts/check   # lint、格式、型別、測試與套件建置，和 CI 跑的一樣
 scripts/fix     # 套用格式化與 lint 自動修正
 uv build        # 把 sdist 與 wheel 建置到 dist/
 ```

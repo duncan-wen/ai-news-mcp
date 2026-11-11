@@ -7,7 +7,12 @@ cd "$(dirname "$0")/.."
 uv run ruff check .
 uv run ruff format --check .
 uv run pyright
-uv run pytest
+# CI also runs on macOS and Windows; these catch platform-only APIs (time.tzset) before a push.
+uv run pyright --pythonplatform Darwin
+uv run pyright --pythonplatform Windows
+# Makes a text read or write without encoding= fail (pyproject's filterwarnings): Windows'
+# default code page cannot read README.zh-TW.md or GLOSSARY.md.
+PYTHONWARNDEFAULTENCODING=1 uv run pytest
 
 # Builds the sdist, then the wheel from it, as a release does: `uv run`'s editable
 # install skips that path (a file left out of the sdist fails only here).

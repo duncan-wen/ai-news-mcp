@@ -79,3 +79,6 @@ timeout = 10
 # Lists any test over half a second: the suite runs in ~4 s, and a slow test usually means
 # a production delay (real time the Clock does not control) leaked into the tests.
 addopts = "--durations=5 --durations-min=0.5"
+# scripts/check sets PYTHONWARNDEFAULTENCODING=1, so an open/read_text/write_text without
+# encoding= warns; this project's modules fail on it (trafilatura has one at import).
+filterwarnings = ["error::EncodingWarning:(ai_news_mcp|tests)"]
