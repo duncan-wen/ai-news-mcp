@@ -49,7 +49,7 @@ select = ["E", "F", "W", "I", "B", "UP", "SIM", "TID"]
 "litellm".msg = "The server never calls an LLM (docs/adr/0002-no-llm-in-the-server.md)."
 
 [tool.pyright]
-include = ["src", "tests"]
+include = ["src", "tests", "scripts"]
 venvPath = "."
 venv = ".venv"
 pythonVersion = "3.11"
@@ -59,3 +59,6 @@ typeCheckingMode = "standard"
 testpaths = ["tests"]
 # A concurrency test whose held Fetcher is never released fails here instead of hanging CI.
 timeout = 10
+# Lists any test over half a second: the suite runs in ~4 s, and a slow test usually means
+# a production delay (real time the Clock does not control) leaked into the tests.
+addopts = "--durations=5 --durations-min=0.5"

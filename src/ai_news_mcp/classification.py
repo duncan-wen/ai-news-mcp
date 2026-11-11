@@ -1,4 +1,7 @@
-"""Keyword rules that add Categories to an Item beyond its Source's defaults (ADR 0002)."""
+"""Keyword rules that add Categories to an Item beyond its Source's defaults (ADR 0002).
+
+Tune them against real Items with `uv run scripts/classify_sample.py`.
+"""
 
 from __future__ import annotations
 
@@ -62,17 +65,27 @@ _TITLE_PATTERNS = _compile(TITLE_RULES)
 _HTML_TAG = re.compile(r"<[^>]+>")
 
 
-def categories_for(
-    title: str, summary: str, defaults: tuple[Category, ...]
-) -> tuple[Category, ...]:
-    """The defaults, then every other Category a keyword rule finds in the title or summary.
+def keyword_matches(title: str, summary: str) -> dict[Category, list[str]]:
+    """The keywords found in the title or summary, by the Category their rules add.
 
     The summary's HTML tags are dropped and only its first SUMMARY_LEAD characters read.
     """
     lead = html.unescape(_HTML_TAG.sub(" ", summary))[:SUMMARY_LEAD]
     text = f"{title}\n{lead}"
-    found = {category for category, pattern in _PATTERNS.items() if pattern.search(text)}
-    found |= {category for category, pattern in _TITLE_PATTERNS.items() if pattern.search(title)}
+    found: dict[Category, list[str]] = {}
+    for patterns, searched in ((_PATTERNS, text), (_TITLE_PATTERNS, title)):
+        for category, pattern in patterns.items():
+            keywords = [match.group(0) for match in pattern.finditer(searched)]
+            if keywords:
+                found.setdefault(category, []).extend(keywords)
+    return found
+
+
+def categories_for(
+    title: str, summary: str, defaults: tuple[Category, ...]
+) -> tuple[Category, ...]:
+    """The defaults, then every other Category a keyword rule finds (see keyword_matches)."""
+    found = keyword_matches(title, summary)
     return defaults + tuple(
         category for category in Category if category in found and category not in defaults
     )

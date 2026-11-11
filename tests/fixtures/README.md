@@ -4,8 +4,8 @@ Each fixture is a real Source response, trimmed. The fake Fetcher in `tests/conf
 
 Making one:
 
-1. Download with the project's User-Agent, e.g. `curl -A "ai-news-mcp/0.1.0 (+https://github.com/duncan-wen/ai-news-mcp)" <url>`. Save it outside the repo.
-2. Keep a handful of Items, chosen to straddle the windows the tests need: some within 30 days and some older (backfill), some within 7 days (What's New).
+1. Download with the project's User-Agent, e.g. `curl --compressed -A "ai-news-mcp/0.1.0 (+https://github.com/duncan-wen/ai-news-mcp)" <url>`. Save it outside the repo. `--compressed` matters: some Sources (DeepMind) send gzip even unasked, and httpx decodes it in production.
+2. Keep a handful of Items, chosen to straddle the windows the tests need: some within 30 days and some older (backfill), some within 7 days (What's New). For RSS or Atom, `uv run scripts/trim_fixture.py SAVED tests/fixtures/NAME.xml --keep "<title>..."` keeps the chosen Items byte for byte.
 3. Keep the response's quirks (content type, encoding, odd fields): parsing is only tested through these files.
 4. Mark any hand edit with an XML or JSON comment at the edited spot, saying what changed. Example: `openai_rss_next_day.xml`.
 5. Note the download date below. Tests set the Clock relative to it.

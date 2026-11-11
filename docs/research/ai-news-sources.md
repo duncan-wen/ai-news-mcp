@@ -5,6 +5,12 @@
 - **標記**：**Verified** = 本次親自抓取確認；**Unverified** = 未能直接確認（被擋或僅推論）。
 - 「全文？」判斷依據：feed 內 `content:encoded` / Atom `content` 是否存在、平均長度（數千字元以上視為全文）。
 
+## 目錄
+
+- **1. 總覽表**：每個 Source 的 URL、auth、全文與否、狀態，一行一個
+- **2. 各來源細節**：2.1 News（OpenAI、Anthropic、Google、Meta、Microsoft、Mistral、HF Blog、TechCrunch、The Verge、MIT TR）· 2.2 Applications（Product Hunt、Hacker News、GitHub Trending、Reddit）· 2.3 Engineering（Simon Willison、Latent Space、LangChain、Vercel、Cloudflare、GitHub Releases）· 2.4 Research / Model evolution（arXiv、HF Daily Papers、HF Hub Models、OpenRouter、Papers with Code、LMArena）· 2.5 其他（X/Twitter、RSSHub）
+- **3. 建議**：哪些直接用 RSS、用 API、要 scrape、跳過
+
 ---
 
 ## 1. 總覽表
