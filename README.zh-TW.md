@@ -4,7 +4,7 @@
 
 一個 MCP server：從 23 個 Source（公司部落格、科技新聞網站、工程部落格、版本發布頁、Hacker News、Product Hunt、Hugging Face 與 OpenRouter）收集 AI 動態存進本機，讓 Claude 查詢有什麼新進內容、搜尋，以及讀取 Item 的全文。
 
-它在你自己的電腦上執行，不需要 API key、排程器或任何雲端服務，也從不呼叫 LLM：你提問時，由 Claude 負責整理摘要。
+它在你自己的電腦上執行，不需要 API key、排程器或任何雲端服務，也從不呼叫 LLM：你提問時，由 Claude 負責整理摘要。任何 MCP client（Claude Code、Claude Desktop、Cursor、VS Code 等）都能用，搭配該 client 使用的模型；文件以 Claude 為例，因為測試是在 Claude 上做的。
 
 **適合你嗎？** 如果你想讓 Claude 幫你整理 AI 動態，不用自己逛十幾個網站，也能接受 Claude 讀取公開 Source 上 Items 的標題與摘要，就適合。它不是有自己介面的新聞閱讀器，不會自己摘要 Items，也不會合併同一事件的 Items，也只知道它的 Source 發布過的內容。
 
@@ -30,7 +30,7 @@
 
 ## 安裝
 
-需要 [uv](https://docs.astral.sh/uv/) 與 [Claude Code](https://claude.com/claude-code)。
+需要 [uv](https://docs.astral.sh/uv/) 與一個 MCP client。用 [Claude Code](https://claude.com/claude-code) 的話：
 
 ```sh
 claude mcp add --scope user ai-news -- uvx ai-news-mcp
@@ -45,7 +45,9 @@ git clone https://github.com/duncan-wen/ai-news-mcp.git
 claude mcp add --scope user ai-news -- uv run --directory /path/to/ai-news-mcp ai-news-mcp
 ```
 
-其他 MCP client 也用同樣方式啟動：指令是 `uvx ai-news-mcp`，透過 stdio 溝通。Claude Desktop 的話，把它加進 `claude_desktop_config.json`（Settings > Developer > Edit Config；macOS 在 `~/Library/Application Support/Claude/`，Windows 在 `%APPDATA%\Claude\`），再重新啟動 Claude Desktop：
+### Claude Desktop
+
+把它加進 `claude_desktop_config.json`（Settings > Developer > Edit Config；macOS 在 `~/Library/Application Support/Claude/`，Windows 在 `%APPDATA%\Claude\`），再重新啟動 Claude Desktop：
 
 ```json
 {
@@ -58,7 +60,41 @@ claude mcp add --scope user ai-news -- uv run --directory /path/to/ai-news-mcp a
 }
 ```
 
-如果 Claude Desktop 找不到 `uvx`，就把它的完整路徑寫進 `command`（`which uvx` 的輸出，Windows 上是 `where uvx`）。
+### Cursor
+
+加進 `~/.cursor/mcp.json` 就每個專案都能用，加進某個專案的 `.cursor/mcp.json` 則只在那個專案能用：
+
+```json
+{
+  "mcpServers": {
+    "ai-news": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["ai-news-mcp"]
+    }
+  }
+}
+```
+
+### VS Code
+
+從 Command Palette 執行 **MCP: Open User Configuration**，加在 `servers` 底下（或寫進 `.vscode/mcp.json`，只在那個 workspace 能用）。之後在 Chat 的 agent mode 就能用它的 tools：
+
+```json
+{
+  "servers": {
+    "ai-news": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["ai-news-mcp"]
+    }
+  }
+}
+```
+
+### 其他 MCP client
+
+每個 client 都用同樣方式啟動：指令是 `uvx ai-news-mcp`，透過 stdio 溝通，不需要參數、環境變數或 API key；從 clone 執行的話，指令是 `uv run --directory /path/to/ai-news-mcp ai-news-mcp`。如果 client 找不到 `uvx`，就把它的完整路徑寫成指令（`which uvx` 的輸出，Windows 上是 `where uvx`）。
 
 ## Tools（工具）
 

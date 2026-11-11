@@ -113,12 +113,20 @@ def readme_code_blocks(language: str, block_language: str) -> list[str]:
 
 
 @pytest.mark.parametrize("language", READMES)
-def test_readme_claude_desktop_example_runs_the_package_script(language):
-    [block] = readme_code_blocks(language, "json")
-    [server] = json.loads(block)["mcpServers"].values()
+def test_readme_mcp_client_examples_run_the_package_script(language):
+    configs = [json.loads(block) for block in readme_code_blocks(language, "json")]
+    # Claude Desktop and Cursor list servers under mcpServers, VS Code under servers.
+    servers = [
+        server
+        for config in configs
+        for key in ("mcpServers", "servers")
+        for server in config.get(key, {}).values()
+    ]
+    assert len(servers) == len(configs) == 3  # Claude Desktop, Cursor, VS Code
 
     [script] = PYPROJECT["scripts"]
-    assert [server["command"], *server["args"]] == ["uvx", script]
+    for server in servers:
+        assert [server["command"], *server["args"]] == ["uvx", script]
 
 
 def test_registry_server_json_publishes_this_package_version():

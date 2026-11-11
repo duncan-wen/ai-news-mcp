@@ -6,7 +6,7 @@
 
 An MCP server that collects AI news from 23 Sources (company blogs, tech news sites, engineering blogs, release pages, Hacker News, Product Hunt, Hugging Face and OpenRouter) into a local store, and lets Claude ask what's new, search it, and read the full text of an Item.
 
-It runs on your machine. It needs no API key, no scheduler and no cloud service, and it never calls an LLM: Claude does the summarising when you ask.
+It runs on your machine. It needs no API key, no scheduler and no cloud service, and it never calls an LLM: Claude does the summarising when you ask. It works in any MCP client (Claude Code, Claude Desktop, Cursor, VS Code and others) with the model that client uses; these docs say Claude because Claude is what it is tested with.
 
 **Is it for you?** Use it if you want Claude to brief you on AI news without you visiting a dozen sites, and you are fine with Claude reading the titles and summaries of Items from public Sources. It is not a news reader with its own interface, it does not summarise Items or merge Items about the same event itself, and it only knows what its Sources publish.
 
@@ -32,7 +32,7 @@ Claude calls `whats_new` for the first two, `search` for the third, `read_item` 
 
 ## Install
 
-You need [uv](https://docs.astral.sh/uv/) and [Claude Code](https://claude.com/claude-code).
+You need [uv](https://docs.astral.sh/uv/) and an MCP client. With [Claude Code](https://claude.com/claude-code):
 
 ```sh
 claude mcp add --scope user ai-news -- uvx ai-news-mcp
@@ -47,7 +47,9 @@ git clone https://github.com/duncan-wen/ai-news-mcp.git
 claude mcp add --scope user ai-news -- uv run --directory /path/to/ai-news-mcp ai-news-mcp
 ```
 
-Other MCP clients start it the same way: the command is `uvx ai-news-mcp`, over stdio. For Claude Desktop, add it to `claude_desktop_config.json` (Settings > Developer > Edit Config; `~/Library/Application Support/Claude/` on macOS, `%APPDATA%\Claude\` on Windows) and restart Claude Desktop:
+### Claude Desktop
+
+Add it to `claude_desktop_config.json` (Settings > Developer > Edit Config; `~/Library/Application Support/Claude/` on macOS, `%APPDATA%\Claude\` on Windows), then restart Claude Desktop:
 
 ```json
 {
@@ -60,7 +62,41 @@ Other MCP clients start it the same way: the command is `uvx ai-news-mcp`, over 
 }
 ```
 
-If Claude Desktop cannot find `uvx`, give its full path as `command` (the output of `which uvx`, or `where uvx` on Windows).
+### Cursor
+
+Add it to `~/.cursor/mcp.json` for every project, or to `.cursor/mcp.json` in one project:
+
+```json
+{
+  "mcpServers": {
+    "ai-news": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["ai-news-mcp"]
+    }
+  }
+}
+```
+
+### VS Code
+
+Run **MCP: Open User Configuration** from the Command Palette and add it under `servers` (or put it in `.vscode/mcp.json` for one workspace). Its tools are then available in Chat in agent mode:
+
+```json
+{
+  "servers": {
+    "ai-news": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["ai-news-mcp"]
+    }
+  }
+}
+```
+
+### Other MCP clients
+
+Every client starts it the same way: the command is `uvx ai-news-mcp`, over stdio, with no arguments, environment variables or API key; from a clone, it is `uv run --directory /path/to/ai-news-mcp ai-news-mcp`. If a client cannot find `uvx`, give its full path as the command (the output of `which uvx`, or `where uvx` on Windows).
 
 ## Tools
 
