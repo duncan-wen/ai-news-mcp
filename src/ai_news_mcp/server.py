@@ -37,6 +37,8 @@ WHATS_NEW_LOOKBACK = timedelta(days=7)
 WHATS_NEW_LIMIT = 100
 # The rest of a summary is one `read_item` away. The tool descriptions say "about 500".
 SHOWN_SUMMARY_LENGTH = 500
+# About 2,500 tokens: enough to check what a page claims; a client asks for more by name.
+READ_ITEM_LENGTH = 10_000
 COLLECTION_WAIT = timedelta(seconds=90)
 STILL_COLLECTING = (
     "A collection is still running, so these are only the Items collected before it. "
@@ -116,22 +118,28 @@ class ItemView(BaseModel):
     url: str
 
     @classmethod
-    def of(cls, item: StoredItem) -> ItemView:
+    def of(cls, item: StoredItem, summary_length: int = SHOWN_SUMMARY_LENGTH) -> ItemView:
         return cls(
             id=item.id,
             title=item.title,
             source=item.source_id,
             categories=list(item.categories),
             published_at=item.published_at,
-            summary=shown_summary(item.summary),
+            summary=shown_summary(item.summary, summary_length),
             url=item.original_url,
         )
 
 
-def shown_summary(summary: str) -> str:
-    """A summary as a client sees it: plain text, cut to SHOWN_SUMMARY_LENGTH characters."""
-    text = plain_text(summary)
-    return text if len(text) <= SHOWN_SUMMARY_LENGTH else text[:SHOWN_SUMMARY_LENGTH] + "…"
+def shown_summary(summary: str, length: int) -> str:
+    """A summary as a client sees it: plain text, cut to `length` characters."""
+    return cut(plain_text(summary), length)
+
+
+def cut(text: str, length: int) -> str:
+    """`text` cut to `length` characters, with "…" marking a cut; nothing for length 0."""
+    if length == 0:
+        return ""
+    return text if len(text) <= length else text[:length] + "…"
 
 
 class SearchResult(BaseModel):
@@ -143,6 +151,8 @@ class FullText(BaseModel):
     title: str
     url: str
     text: str
+    truncated: bool
+    full_length: int
 
 
 class WhatsNew(BaseModel):
@@ -273,6 +283,7 @@ def create_server(
         categories: list[Category] | None = None,
         sources: list[str] | None = None,
         limit: Annotated[int, Field(ge=1)] = SEARCH_LIMIT,
+        summary_length: Annotated[int, Field(ge=0)] = SHOWN_SUMMARY_LENGTH,
     ) -> SearchResult:
         """Search stored Items by text, publish time, Category and Source, in any mix.
 
@@ -286,8 +297,9 @@ def create_server(
         offset, or a date alone (midnight), is UTC. `categories`: in any of them (News,
         Applications, Engineering, Models; see `whats_new`). `sources`: from any of these
         Source ids (see `list_sources`). An empty `categories` or `sources` list matches
-        nothing. Results are newest first, at most `limit` (default 20). Searching never
-        moves a Checkpoint.
+        nothing. Results are newest first, at most `limit` (default 20). `summary_length`:
+        cut each shown summary to that many characters instead (0: no summary), such as a
+        short length to skim many Items by title. Searching never moves a Checkpoint.
         """
         if sources is not None:
             unknown = [source_id for source_id in sources if source_id not in known_source_ids]
@@ -304,15 +316,20 @@ def create_server(
             source_ids=sources,
             limit=limit,
         )
-        return SearchResult(items=[ItemView.of(item) for item in items])
+        return SearchResult(items=[ItemView.of(item, summary_length) for item in items])
 
     @tool
-    async def read_item(id: int) -> FullText:
+    async def read_item(
+        id: int,
+        max_length: Annotated[int, Field(ge=1)] = READ_ITEM_LENGTH,
+    ) -> FullText:
         """The full text of an Item: fetches its original page and extracts the main text.
 
         Use when an Item's summary is not enough. `id` is an Item's `id` from `whats_new`
-        or `search`. If the page cannot be fetched or has no main text, the error gives the
-        Item's summary and link instead.
+        or `search`. The text is cut to `max_length` characters (default 10,000);
+        `truncated` says whether it was cut and `full_length` gives the whole text's length,
+        so call again with a larger `max_length` for the rest. If the page cannot be fetched
+        or has no main text, the error gives the Item's summary and link instead.
         """
         item = store.item(id)
         if item is None:
@@ -326,7 +343,14 @@ def create_server(
         if text is None:
             reason = "no main text could be extracted from its page"
             raise ToolError(unreadable_message(item, reason))
-        return FullText(id=item.id, title=item.title, url=item.original_url, text=text)
+        return FullText(
+            id=item.id,
+            title=item.title,
+            url=item.original_url,
+            text=cut(text, max_length),
+            truncated=len(text) > max_length,
+            full_length=len(text),
+        )
 
     @tool
     async def whats_new(
