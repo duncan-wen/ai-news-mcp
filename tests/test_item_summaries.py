@@ -55,3 +55,20 @@ async def test_read_item_falls_back_to_the_whole_summary_as_plain_text(connect):
     assert "Its summary: Claude Fable 5.2 responds closely" in error
     assert "— Prompting Claude Fable 5.2, Anthropic documentation" in error  # past 500
     assert "<" not in error
+
+
+async def test_search_cuts_summaries_to_the_summary_length_asked_for(connect):
+    async with connect((SIMON_WILLISON,)) as client:
+        result = await search_collected(client, query="Quoting Prompting Claude", summary_length=40)
+
+    [item] = result["items"]
+    assert item["summary"] == "Claude Fable 5.2 responds closely to wha…"
+
+
+async def test_search_with_summary_length_0_shows_no_summary(connect):
+    async with connect((SIMON_WILLISON,)) as client:
+        result = await search_collected(client, query="datasette-llm 0.1a10", summary_length=0)
+
+    [item] = result["items"]
+    assert item["summary"] == ""
+    assert item["title"] == "datasette-llm 0.1a10"

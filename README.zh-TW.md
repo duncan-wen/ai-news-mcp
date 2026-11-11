@@ -101,8 +101,8 @@ claude mcp add --scope user ai-news -- uv run --directory /path/to/ai-news-mcp a
 | Tool | 用途 |
 | --- | --- |
 | `whats_new` | 所問的每個 Category（未指定則全部）自上次 Checkpoint 以來收進、而且是最近 7 天內發布的 Items，大約最多 100 則，並把這些 Checkpoint 移到現在。 |
-| `search` | 依文字、`since` / `until`、Category 和 Source id 搜尋 Items，新的在前。從不移動 Checkpoint。 |
-| `read_item` | Item 原始網頁的正文。 |
+| `search` | 依文字、`since` / `until`、Category 和 Source id 搜尋 Items，新的在前。`summary_length` 可縮短顯示的摘要（0：不顯示）。從不移動 Checkpoint。 |
+| `read_item` | Item 原始網頁的正文，截到 `max_length` 個字元（預設 10,000）；結果會標明有沒有截斷。 |
 | `list_sources` | 每個 Source 的網址、預設 Category 與收集狀態。 |
 | `collect_now` | 立刻從每個 Source 收集，回報各自新增幾則或失敗原因。 |
 

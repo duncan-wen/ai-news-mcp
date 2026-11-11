@@ -80,3 +80,17 @@ async def test_collecting_does_not_fetch_the_pages_of_items(connect, fetcher):
         await carbon_item(client)
 
     assert set(fetcher.requests) == {THE_VERGE_AI_URL}
+
+
+async def test_read_item_cuts_the_text_to_max_length_and_says_so(connect, fetcher):
+    fetcher.serve(CARBON_URL, "verge_item_page.html")
+    async with connect((THE_VERGE_AI,)) as client:
+        item = await carbon_item(client)
+        whole = await call(client, "read_item", id=item["id"])
+        cut = await call(client, "read_item", id=item["id"], max_length=60)
+
+    assert whole["truncated"] is False
+    assert whole["full_length"] == len(whole["text"])
+    assert cut["text"] == whole["text"][:60] + "…"
+    assert cut["truncated"] is True
+    assert cut["full_length"] == whole["full_length"]
