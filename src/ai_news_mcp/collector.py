@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from datetime import timedelta
 
 from .adapters import FormatError, parse_rss
+from .classification import categories_for
 from .clock import Clock
 from .fetcher import Fetcher, FetchError
 from .sources import Source
@@ -64,7 +65,10 @@ class Collector:
         return last is None or self._clock.now() - last > STALE_AFTER
 
     async def _collect_all(self) -> list[SourceReport]:
-        reports = [await self._collect_source(source) for source in self._sources]
+        # All at once: the Fetcher spaces out requests to the same host.
+        reports = list(
+            await asyncio.gather(*(self._collect_source(source) for source in self._sources))
+        )
         # When every Source failed (say, the machine is offline) nothing is fresher than
         # before, so the next whats_new collects again.
         if any(report.error is None for report in reports):
@@ -96,7 +100,9 @@ class Collector:
                     published_at=published_at,
                     collected_at=now,
                     source_id=source.id,
-                    categories=source.default_categories,
+                    categories=categories_for(
+                        parsed.title, parsed.summary, source.default_categories
+                    ),
                 )
             )
         added = self._store.add_items(new_items)

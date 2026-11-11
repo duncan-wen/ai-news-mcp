@@ -5,9 +5,9 @@ from datetime import timedelta
 import pytest
 
 from ai_news_mcp.fetcher import FetchError
-from ai_news_mcp.sources import DEFAULT_SOURCES, Category, Source
+from ai_news_mcp.sources import Category, Source
 
-from .conftest import OPENAI_NEWS_URL, FakeFetcher, call
+from .conftest import OPENAI_NEWS, OPENAI_NEWS_URL, FakeFetcher, call
 
 pytestmark = pytest.mark.anyio
 
@@ -19,7 +19,7 @@ MOVED = Source(
     url=MOVED_URL,
     default_categories=(Category.ENGINEERING,),
 )
-MOVED_THEN_OPENAI = (MOVED, *DEFAULT_SOURCES)  # the broken Source first, then a working one
+MOVED_THEN_OPENAI = (MOVED, OPENAI_NEWS)  # the broken Source first, then a working one
 
 
 def not_found(fetcher: FakeFetcher) -> None:

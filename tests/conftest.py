@@ -18,6 +18,14 @@ FIXTURES = Path(__file__).parent / "fixtures"
 OPENAI_NEWS_URL = "https://openai.com/news/rss.xml"
 
 
+def first_version_source(source_id: str) -> Source:
+    return next(source for source in DEFAULT_SOURCES if source.id == source_id)
+
+
+# Most tests collect this one Source; a test of the whole first-version list passes it.
+OPENAI_NEWS = first_version_source("openai-news")
+
+
 class FakeFetcher:
     """Serves fixture files by URL; any other URL fails like a 404.
 
@@ -101,12 +109,16 @@ def connect(tmp_path: Path, fetcher: FakeFetcher, clock: FakeClock) -> Callable[
     `collect_now` then runs a second collection, so assert its `added`, or count
     `fetcher.requests`, only after a collection the test itself waited for, or after
     clearing them.
+
+    Requests to one host are not spaced out unless a test passes `host_interval`: the
+    production interval is real time, which the Clock does not control.
     """
 
     @asynccontextmanager
     async def _connect(
-        sources: tuple[Source, ...] = DEFAULT_SOURCES, **settings: Any
+        sources: tuple[Source, ...] = (OPENAI_NEWS,), **settings: Any
     ) -> AsyncGenerator[Client]:
+        settings.setdefault("host_interval", timedelta(0))
         server = create_server(
             store_path=tmp_path / "store.sqlite3",
             fetcher=fetcher,

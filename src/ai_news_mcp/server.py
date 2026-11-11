@@ -15,7 +15,7 @@ from pydantic import BaseModel
 
 from .clock import Clock
 from .collector import Collector
-from .fetcher import PROJECT_NAME, VERSION, Fetcher
+from .fetcher import HOST_INTERVAL, PROJECT_NAME, VERSION, Fetcher, HostPacedFetcher
 from .sources import DEFAULT_SOURCES, Category, Source
 from .store import SourceHealth, Store, StoredItem
 
@@ -147,9 +147,10 @@ def create_server(
     clock: Clock,
     sources: tuple[Source, ...] = DEFAULT_SOURCES,
     collection_wait: timedelta = COLLECTION_WAIT,
+    host_interval: timedelta = HOST_INTERVAL,
 ) -> MCPServer:
     store = Store(store_path)
-    collector = Collector(sources, store, fetcher, clock)
+    collector = Collector(sources, store, HostPacedFetcher(fetcher, host_interval), clock)
 
     @asynccontextmanager
     async def lifespan(_: MCPServer) -> AsyncGenerator[None]:

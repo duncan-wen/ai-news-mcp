@@ -82,7 +82,7 @@ async def test_items_carry_every_default_category_of_their_source(connect):
         result = await call(client, "whats_new")
         found = await call(client, "search", query="AWS Marketplace")
 
-    assert {tuple(item["categories"]) for item in result["items"]} == {("News", "Models")}
+    assert all({"News", "Models"} <= set(item["categories"]) for item in result["items"])
     assert [item["categories"] for item in found["items"]] == [["News", "Models"]]
 
 
@@ -102,7 +102,10 @@ async def test_whats_new_for_some_categories_leaves_other_categories_checkpoints
     assert len(models["items"]) == 6
     assert models_again["items"] == []
     assert [item["id"] for item in news["items"]] == [item["id"] for item in models["items"]]
-    assert everything["items"] == []
+    # Only the Item a keyword put in Applications, a Category not viewed yet.
+    assert [item["title"] for item in everything["items"]] == [
+        "Evernote turns AI-driven discovery into paid subscriptions"
+    ]
 
 
 async def test_whats_new_for_one_category_returns_only_items_in_it(connect):

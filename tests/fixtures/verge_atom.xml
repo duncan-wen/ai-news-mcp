@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?><feed
+	xmlns="http://www.w3.org/2005/Atom"
+	xmlns:thr="http://purl.org/syndication/thread/1.0"
+	xml:lang="en-US"
+	>
+	<title type="text">AI | The Verge</title>
+	<subtitle type="text">The Verge is about technology and how it makes us feel. Founded in 2011, we offer our audience everything from breaking news to reviews to award-winning features and investigations, on our site, in video, and in podcasts.</subtitle>
+
+	<updated>2026-11-10T19:31:58+00:00</updated>
+
+	<link rel="alternate" type="text/html" href="https://www.theverge.com/ai-artificial-intelligence" />
+	<id>https://www.theverge.com/rss/ai-artificial-intelligence/index.xml</id>
+	<link rel="self" type="application/atom+xml" href="https://www.theverge.com/rss/ai-artificial-intelligence/index.xml" />
+
+	<icon>https://platform.theverge.com/wp-content/uploads/sites/2/2025/01/verge-rss-large_80b47e.png?w=150&amp;h=150&amp;crop=1</icon>
+		<entry>
+			
+			<author>
+				<name>Jay Peters</name>
+			</author>
+			
+			<title type="html"><![CDATA[The indie game community is in disarray over AI and Big Walk]]></title>
+			<link rel="alternate" type="text/html" href="https://www.theverge.com/games/1030994/big-walk-independent-games-festival-igf-ai" />
+			<id>https://www.theverge.com/?p=1030994</id>
+			<updated>2026-11-10T14:06:22-05:00</updated>
+			<published>2026-11-10T12:32:47-05:00</published>
+			<category scheme="https://www.theverge.com" term="AI" /><category scheme="https://www.theverge.com" term="Entertainment" /><category scheme="https://www.theverge.com" term="Gaming" /><category scheme="https://www.theverge.com" term="News" />
+							<summary type="html"><![CDATA[Some Independent Games Festival (IGF) jurors published a statement yesterday saying they would not vote for games that use generative AI in "any capacity." Soon after, the developer of indie hit Big Walk has published a statement saying it "sparingly" used AI in the "final stretch" of the game's development to "help work through difficult [&#8230;]]]></summary>
+			
+							<content type="html">
+											<![CDATA[
+
+						
+<figure>
+
+<img alt="A screenshot from Big Walk." data-caption="" data-portal-copyright="Image: Panic" data-has-syndication-rights="1" src="https://platform.theverge.com/wp-content/uploads/sites/2/2026/07/BigWalk_Screenshot_Jun26_01.png?quality=90&#038;strip=all&#038;crop=0,0,100,100" />
+	<figcaption>
+		</figcaption>
+</figure>
+<p class="wp-block-paragraph">Some Independent Games Festival (IGF) jurors published a statement yesterday saying they would not vote for games that use generative AI in "any capacity." Soon after, the developer of indie hit <em>Big Walk</em> has published a statement saying it "sparingly" used AI in the "final stretch" of the game's development to "help work through difficult technical challenges and bugs."</p>
+<p class="wp-block-paragraph">According to the <a href="https://bsky.app/profile/austinwalker.bsky.social/post/3mzvyqaxnzc2w?ref=aftermath.site">jurors' statement</a>, a copy of which was posted by Austin Walker, while this year's IGF entries have been "incredible," there has been "a significant increase" in the number of games "developed with generative AI tools," leading to "fairly intense discussion a …</p>
+<p><a href="https://www.theverge.com/games/1030994/big-walk-independent-games-festival-igf-ai">Read the full story at The Verge.</a></p>
+						]]>
+									</content>
+			
+					</entry><entry>
+			
+			<author>
+				<name>Robert Hart</name>
+			</author>
+			
+			<title type="html"><![CDATA[Google releases Gemini 4 Carbon with agent ‘swarm’ feature]]></title>
+			<link rel="alternate" type="text/html" href="https://www.theverge.com/ai-artificial-intelligence/1030787/google-gemini-4-carbon-public-rollout" />
+			<id>https://www.theverge.com/?p=1030787</id>
+			<updated>2026-11-10T10:30:28-05:00</updated>
+			<published>2026-11-10T11:00:00-05:00</published>
+			<category scheme="https://www.theverge.com" term="AI" /><category scheme="https://www.theverge.com" term="Google" /><category scheme="https://www.theverge.com" term="News" /><category scheme="https://www.theverge.com" term="Tech" />
+							<summary type="html"><![CDATA[Google is rolling out its latest AI model, Gemini 4 Carbon, to the general public after releasing it to a select group of "cybersecurity defenders" two weeks ago. Google claims Carbon is its "strongest model" yet, and capable of competing with the very best systems from Anthropic and OpenAI. Google says Gemini 4 Carbon "pushes [&#8230;]]]></summary>
+			
+							<content type="html">
+											<![CDATA[
+
+						
+<figure>
+
+<img alt="" data-caption="" data-portal-copyright="Image: Google" data-has-syndication-rights="1" src="https://platform.theverge.com/wp-content/uploads/sites/2/2026/11/Gemini-4-Carbon-Key-Art.jpg?quality=90&#038;strip=all&#038;crop=0,0,100,100" />
+	<figcaption>
+		</figcaption>
+</figure>
+<p class="wp-block-paragraph">Google is <a href="https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-4-carbon-now-available/">rolling out</a> its latest AI model, Gemini 4 Carbon, to the general public after <a href="https://www.theverge.com/tech/1021339/google-gemini-4-carbon-cybersecurity-frontier">releasing it to a select group</a> of "cybersecurity defenders" two weeks ago. Google claims Carbon is its "strongest model" yet, and capable of competing with the very best systems from Anthropic and OpenAI.</p>
+<p class="wp-block-paragraph">Google says Gemini 4 Carbon "pushes the frontier even further" than Argon, referring to the company's other frontier model that <a href="https://www.theverge.com/ai-artificial-intelligence/1009862/google-releases-gemini-4-argon">launched only last month</a>. The company said Argon will likely remain "the ideal choice for the majority of software engineering and knowledge work," but that Carbon is "built for tasks that test the limits of a model's intellige …</p>
+<p><a href="https://www.theverge.com/ai-artificial-intelligence/1030787/google-gemini-4-carbon-public-rollout">Read the full story at The Verge.</a></p>
+						]]>
+									</content>
+			
+					</entry><entry>
+			
+			<author>
+				<name>Stevie Bonifield</name>
+			</author>
+			
+			<title type="html"><![CDATA[Anthropic targets $1.4 trillion IPO]]></title>
+			<link rel="alternate" type="text/html" href="https://www.theverge.com/ai-artificial-intelligence/1030703/anthropic-ipo-1-4-trillion" />
+			<id>https://www.theverge.com/?p=1030703</id>
+			<updated>2026-11-10T11:38:24-05:00</updated>
+			<published>2026-11-10T09:06:54-05:00</published>
+			<category scheme="https://www.theverge.com" term="AI" /><category scheme="https://www.theverge.com" term="Anthropic" /><category scheme="https://www.theverge.com" term="Business" /><category scheme="https://www.theverge.com" term="News" />
+							<summary type="html"><![CDATA[Anthropic confirmed on Tuesday that its IPO could be one of the biggest ever, even while falling short of previous expectations. Its IPO price is expected to be between $70.00 and $78.00 per share, which would put its valuation as high as $1.4 trillion, according to the The New York Times. The Wall Street Journal [&#8230;]]]></summary>
+			
+							<content type="html">
+											<![CDATA[
+
+						
+<figure>
+
+<img alt="Anthropic logo on an orange background." data-caption="" data-portal-copyright="Image: Cath Virginia / The Verge" data-has-syndication-rights="1" src="https://platform.theverge.com/wp-content/uploads/sites/2/2026/01/STK269_ANTHROPIC_2_D.jpg?quality=90&#038;strip=all&#038;crop=0,0,100,100" />
+	<figcaption>
+		</figcaption>
+</figure>
+<p class="wp-block-paragraph">Anthropic confirmed on Tuesday that its IPO could be one of the biggest ever, even while falling short of previous expectations. Its <a href="https://www.anthropic.com/news/roadshow-launch">IPO price</a> is expected to be between $70.00 and $78.00 per share, which would put its valuation as high as $1.4 trillion, according to the <a href="https://www.nytimes.com/2026/11/10/technology/anthropic-ipo-valuation-share-price.html"><em>The New York Times</em></a>. <a href="https://www.wsj.com/finance/stocks/anthropic-prepares-to-push-ahead-with-ipo-despite-market-jitters-843dd16c"><em>The Wall Street Journal</em></a> reports that according to its sources, Anthropic is "aiming for its shares to start trading Thursday or Friday next week."</p>
+<p class="wp-block-paragraph">As <em><a href="https://www.reuters.com/business/anthropic-ipo-raise-much-644-billion-latest-draft-prospectus-shows-2026-11-10/">Reuters</a></em> notes, the Anthropic IPO was previously expected to be valued at as much as $2 trillion. As of last week, Anthropic's rival OpenAI was <a href="https://www.theverge.com/ai-artificial-intelligence/1029380/openai-1-25-trillion-investment-valuation">valued at $1.25 trillion</a>.</p>
+<p class="wp-block-paragraph">Those lower expectations follow month …</p>
+<p><a href="https://www.theverge.com/ai-artificial-intelligence/1030703/anthropic-ipo-1-4-trillion">Read the full story at The Verge.</a></p>
+						]]>
+									</content>
+			
+					</entry><entry>
+			
+			<author>
+				<name>Jess Weatherbed</name>
+			</author>
+			
+			<title type="html"><![CDATA[Photoshop, Lightroom, and Premiere are making it easier to remove things]]></title>
+			<link rel="alternate" type="text/html" href="https://www.theverge.com/tech/1030653/adobe-max-2026-photoshop-premiere-removal-updates" />
+			<id>https://www.theverge.com/?p=1030653</id>
+			<updated>2026-11-10T10:49:40-05:00</updated>
+			<published>2026-11-10T09:00:00-05:00</published>
+			<category scheme="https://www.theverge.com" term="Adobe" /><category scheme="https://www.theverge.com" term="AI" /><category scheme="https://www.theverge.com" term="Creators" /><category scheme="https://www.theverge.com" term="News" /><category scheme="https://www.theverge.com" term="Tech" />
+							<summary type="html"><![CDATA[Adobe is expanding its Creative Cloud apps and Firefly AI platform with new capabilities that aim to make design and editing projects faster and less complicated. Some of the announcements from Adobe's Max event today include features for automatically removing objects, blemishes, and other unwanted distractions in Premiere, Photoshop, and Lightroom, alongside new generative AI [&#8230;]]]></summary>
+			
+							<content type="html">
+											<![CDATA[
+
+						
+<figure>
+
+<img alt="A before and after of an edited image in Adobe Photoshop." data-caption="Photoshop’s Quick Compare feature lets you quickly review a before-and-after comparison of edits. | Image: Adobe" data-portal-copyright="Image: Adobe" data-has-syndication-rights="1" src="https://platform.theverge.com/wp-content/uploads/sites/2/2026/11/PS-Remove-No-Logo-2.jpg?quality=90&#038;strip=all&#038;crop=0,0,100,100" />
+	<figcaption>
+	Photoshop’s Quick Compare feature lets you quickly review a before-and-after comparison of edits. | Image: Adobe	</figcaption>
+</figure>
+<p class="wp-block-paragraph">Adobe is expanding its Creative Cloud apps and Firefly AI platform with new capabilities that aim to make design and editing projects faster and less complicated. Some of the announcements from Adobe's Max event today include features for automatically removing objects, blemishes, and other unwanted distractions in Premiere, Photoshop, and Lightroom, alongside new generative AI tools and collaborative experiences across Adobe's apps and Firefly suite.</p>
+<p class="wp-block-paragraph">In Premiere, Adobe is introducing a new Generative Remove tool in beta that lets you erase unwanted objects and distractions like boom mics and background clutter directly on the video editing …</p>
+<p><a href="https://www.theverge.com/tech/1030653/adobe-max-2026-photoshop-premiere-removal-updates">Read the full story at The Verge.</a></p>
+						]]>
+									</content>
+			
+					</entry><entry>
+			
+			<author>
+				<name>Jennifer Pattison Tuohy</name>
+			</author>
+			
+			<title type="html"><![CDATA[Hands-on with Ring’s new AI drone camera for your home]]></title>
+			<link rel="alternate" type="text/html" href="https://www.theverge.com/tech/1030601/ring-drone-cam-hands-on-price-release-date-ai-pilot" />
+			<id>https://www.theverge.com/?p=1030601</id>
+			<updated>2026-11-10T09:28:59-05:00</updated>
+			<published>2026-11-10T08:30:00-05:00</published>
+			<category scheme="https://www.theverge.com" term="AI" /><category scheme="https://www.theverge.com" term="Cameras" /><category scheme="https://www.theverge.com" term="Drones" /><category scheme="https://www.theverge.com" term="Gadgets" /><category scheme="https://www.theverge.com" term="Hands-on" /><category scheme="https://www.theverge.com" term="Reviews" /><category scheme="https://www.theverge.com" term="Smart Home" /><category scheme="https://www.theverge.com" term="Tech" />
+							<summary type="html"><![CDATA[Ring is finally shipping a flying indoor drone camera. For real this time. The Ring Drone Cam will arrive on January 27th, 2027, for $249.99, Ring founder Jamie Siminoff said at a launch event in New York City this week. If it does actually ship, it will arrive almost six years after the company announced [&#8230;]]]></summary>
+			
+							<content type="html">
+											<![CDATA[
+
+						
+<figure>
+
+<img alt="" data-caption="Ring’s new Drone Cam is a flying indoor security camera." data-portal-copyright="" data-has-syndication-rights="1" src="https://platform.theverge.com/wp-content/uploads/sites/2/2026/11/DSC01268.jpg?quality=90&#038;strip=all&#038;crop=0,0,100,100" />
+	<figcaption>
+	Ring’s new Drone Cam is a flying indoor security camera.	</figcaption>
+</figure>
+<p class="wp-block-paragraph">Ring is finally shipping a flying indoor drone camera. For real this time. The <a href="https://www.amazon.com/dp/B0H1PBKM3X">Ring Drone Cam</a> will arrive on <a href="https://www.amazon.com/dp/B0H1PBKM3X">January 27th, 2027, for $249.99</a>, Ring founder Jamie Siminoff said at a launch event in New York City this week. If it does actually ship, it will arrive almost six years after the company announced its first flying camera, <a href="https://www.theverge.com/2021/9/28/22692048/ring-always-home-cam-drone-amazon-price-release-date-specs">the Ring Always Home Cam.</a></p>
+<p class="wp-block-paragraph">Designed to patrol inside your home when you're not there, the Drone Cam is an AI-powered drone that can react to triggers from Ring sensors, such as detecting motion, a door opening, a water leak, or an alarm sounding. When triggered, it flies along preprogrammed routes to a set location, …</p>
+<p><a href="https://www.theverge.com/tech/1030601/ring-drone-cam-hands-on-price-release-date-ai-pilot">Read the full story at The Verge.</a></p>
+						]]>
+									</content>
+			
+					</entry>
+	</feed>
