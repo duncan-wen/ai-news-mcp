@@ -70,6 +70,7 @@ async def test_list_sources_shows_each_sources_categories_and_collection_state(c
     assert moved == {
         "id": "moved-blog",
         "name": "Moved Blog",
+        "url": MOVED_URL,
         "default_categories": ["Engineering"],
         "last_attempt_at": "2026-11-11T13:00:00Z",
         "last_success_at": None,
@@ -78,6 +79,7 @@ async def test_list_sources_shows_each_sources_categories_and_collection_state(c
     assert openai == {
         "id": "openai-news",
         "name": "OpenAI News",
+        "url": OPENAI_NEWS_URL,
         "default_categories": ["News"],
         "last_attempt_at": "2026-11-11T13:00:00Z",
         "last_success_at": "2026-11-11T13:00:00Z",

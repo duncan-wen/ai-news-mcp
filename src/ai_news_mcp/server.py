@@ -25,6 +25,7 @@ from .fetcher import (
     HostPacedFetcher,
 )
 from .full_text import extract_main_text
+from .source_config import configured_sources
 from .sources import DEFAULT_SOURCES, Category, Source
 from .store import SourceHealth, Store, StoredItem
 
@@ -73,6 +74,7 @@ class CollectReport(BaseModel):
 class SourceView(BaseModel):
     id: str
     name: str
+    url: str
     default_categories: list[Category]
     last_attempt_at: datetime | None
     last_success_at: datetime | None
@@ -85,6 +87,7 @@ class SourceView(BaseModel):
         return cls(
             id=source.id,
             name=source.name,
+            url=source.url,
             default_categories=list(source.default_categories),
             last_attempt_at=health.last_attempt_at if health else None,
             last_success_at=health.last_success_at if health else None,
@@ -178,9 +181,11 @@ def create_server(
     fetcher: Fetcher,
     clock: Clock,
     sources: tuple[Source, ...] = DEFAULT_SOURCES,
+    config_path: Path | None = None,
     collection_wait: timedelta = COLLECTION_WAIT,
     host_interval: timedelta = HOST_INTERVAL,
 ) -> MCPServer:
+    sources = configured_sources(sources, config_path)
     store = Store(store_path)
     paced_fetcher = HostPacedFetcher(fetcher, host_interval)
     collector = Collector(sources, store, paced_fetcher, clock)
@@ -217,7 +222,7 @@ def create_server(
 
     @tool
     async def list_sources() -> SourceList:
-        """Every Source with its default Categories and collection state.
+        """Every Source with its URL, default Categories and collection state.
 
         The state is when it was last tried, when it last succeeded, its last error and
         how many collections in a row it has failed. The last error is kept after a success,
