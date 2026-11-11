@@ -5,7 +5,7 @@ Each fixture is a real Source response, or the original page of an Item (for `re
 Making one:
 
 1. Download with the project's User-Agent, e.g. `curl --compressed -A "ai-news-mcp/0.1.0 (+https://github.com/duncan-wen/ai-news-mcp)" <url>`. Save it outside the repo. `--compressed` matters: some Sources (DeepMind) send gzip even unasked, and httpx decodes it in production.
-2. Keep a handful of Items, chosen to straddle the windows the tests need: some within 30 days and some older (backfill), some within 7 days (What's New). `uv run scripts/trim_fixture.py SAVED tests/fixtures/NAME.xml --keep "<text in one Item>"` keeps the chosen Items: byte for byte for RSS, Atom or a sitemap, pretty-printed for JSON (the elements of its one top-level array, such as Algolia's `hits`, or of the document itself when it is an array, as Hugging Face's models are).
+2. Keep a handful of Items, chosen to straddle the windows the tests need: some within 30 days and some older (backfill), some within 7 days (What's New). `uv run scripts/trim_fixture.py SAVED tests/fixtures/NAME.xml --keep "<text in one Item>"` keeps the chosen Items: byte for byte for RSS, Atom or a sitemap, pretty-printed for JSON (the elements of its one top-level array, such as Algolia's `hits`, or of the document itself when it is an array, as Hugging Face's models are). An Item's page (`SAVED.html`) takes no `--keep`: the script drops markup with no text and stops if the extracted main text would change.
 3. Keep the response's quirks (content type, encoding, odd fields): parsing is only tested through these files.
 4. Mark any hand edit at the edited spot, saying what changed: an XML comment (example: `openai_rss_next_day.xml`). JSON has no comments, so a JSON fixture's hand edits go in its Notes below. Prefer leaving Items out over editing them: a "next day" fixture can be the same download with one more Item kept (example: `hn_algolia_next_day.json`).
 5. Note the download date below. Tests set the Clock relative to it.
@@ -17,7 +17,7 @@ Making one:
 | `openai_rss_next_day.xml` | OpenAI News RSS | 2026-11-11 | 2 Items from `openai_rss.xml` with a tracking query or trailing slash added; 1 Item (9 Nov) not in `openai_rss.xml` |
 | `mistral_rss.xml` | Mistral News RSS | 2026-11-11 | Served as `text/plain`. 6 Items: 4 from 15 Oct to 5 Nov 2026, 1 from 6 Oct, 1 from Sept 2026 |
 | `verge_atom.xml` | The Verge AI Atom | 2026-11-11 | 5 Items, all 10 Nov 2026, with Atom `<content>` |
-| `verge_item_page.html` | The original page of an Item in `verge_atom.xml` (Gemini 4 Carbon) | 2026-11-11 | 391 KB → 71 KB: script, style, svg, noscript, link, iframe, template elements and srcset, sizes, style, data-src attributes removed (noted at the top); the extracted main text is unchanged |
+| `verge_item_page.html` | The original page of an Item in `verge_atom.xml` (Gemini 4 Carbon) | 2026-11-11 | Trimmed by `trim_fixture.py`, 391 KB → 71 KB |
 | `script_only_page.html` | none (hand-made) | 2026-11-11 | A page whose text is rendered by JavaScript: no main text to extract |
 | `anthropic_sitemap.xml` | Anthropic sitemap | 2026-11-11 | 10 of 570 URLs: 3 outside /news/, the /news listing pages (`/news`, `/news/models`, no lastmod), 3 /news/ pages (one with a lastmod from a bulk edit on 19 Oct), 1 /research/ page |
 | `anthropic_sitemap_next_day.xml` | Anthropic sitemap | 2026-11-11 | `anthropic_sitemap.xml` plus 1 /news/ and 1 /research/ URL left out of it, as if newly listed; 1 hand edit: an old /news/ page's lastmod moved to 12 Nov |

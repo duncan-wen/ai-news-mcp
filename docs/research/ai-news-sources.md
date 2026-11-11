@@ -67,6 +67,7 @@
 **OpenAI** — Verified
 - `https://openai.com/news/rss.xml` → 200 `text/xml`；舊 `https://openai.com/blog/rss.xml` 會 redirect 到同一個 URL。
 - 驚喜點：feed 一次回傳 **1,375 個 item**（整個歷史），約 1.1 MB，只有 `<description>` 摘要（avg ~178 字元），沒有 `content:encoded`。實作時要用 `pubDate`/guid 去重並只取最新 N 筆。
+- 文章頁（`openai.com/index/...`）對本專案的 User-Agent 回 **403**（2026-11-11 測試），feed 仍是 200：`read_item` 讀不到 OpenAI 的全文，也無法從它做 HTML fixture。
 
 **Anthropic（News / Engineering / Research）** — Verified：**沒有官方 RSS**
 - 測試 `https://www.anthropic.com/rss.xml`、`/news/rss.xml`、`/news/rss`、`/feed.xml`、`/engineering/rss.xml`（會 redirect 到 `/research/rss.xml`）全部 **404**；HTML 頁 https://www.anthropic.com/news 和 https://www.anthropic.com/engineering 沒有 `<link rel="alternate" type="application/rss+xml">`。

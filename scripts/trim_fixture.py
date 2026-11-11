@@ -11,6 +11,10 @@ The format goes by the saved file:
 - JSON (a `.json` file): the Items are the elements of its one top-level array, such as
   Algolia's `hits`, or of the document itself when it is an array (Hugging Face
   models). Every other field is kept; the fixture is written pretty-printed.
+- HTML (a `.html` file, an Item's original page for `read_item`): takes no `--keep`.
+  Drops markup that carries no text (script, style, svg, noscript, link, iframe,
+  template; srcset, sizes, style, data-src attributes), notes that at the top, and
+  stops before writing if the extracted main text would change.
 
 Each `--keep` text must be found in exactly one Item (for JSON, in the element's JSON
 text: a title, or an id field written as JSON, such as `'"id": "org/model"'` or
@@ -27,9 +31,16 @@ from collections.abc import Callable, Sequence
 from pathlib import Path
 from typing import Any, TypeVar
 
+import lxml.html
+
+from ai_news_mcp.full_text import extract_main_text
+
 FEED_ITEM = re.compile(rb"<(item|entry)[\s>].*?</\1>", re.DOTALL)  # RSS <item>, Atom <entry>
 # Only in a sitemap: an RSS channel's <image> also holds a <url>.
 SITEMAP_ITEM = re.compile(rb"<url[\s>].*?</url>", re.DOTALL)
+
+HTML_DROPPED_ELEMENTS = ("script", "style", "svg", "noscript", "link", "iframe", "template")
+HTML_DROPPED_ATTRIBUTES = ("srcset", "sizes", "style", "data-src")
 
 T = TypeVar("T")
 
@@ -39,14 +50,19 @@ def main() -> int:
     parser.add_argument("saved", type=Path, help="the response as downloaded")
     parser.add_argument("fixture", type=Path, help="the fixture file to write")
     parser.add_argument(
-        "--keep", action="append", required=True, help="text found in one Item to keep"
+        "--keep", action="append", default=[], help="text found in one Item to keep"
     )
     arguments = parser.parse_args()
+    is_html = arguments.saved.suffix == ".html"
+    if is_html == bool(arguments.keep):
+        parser.error("--keep is required, except for an .html page, which takes none")
 
     body = arguments.saved.read_bytes()
     if body[:2] == b"\x1f\x8b":
         sys.exit(f"{arguments.saved} is gzip: download with `curl --compressed`")
-    if arguments.saved.suffix == ".json":
+    if is_html:
+        _trim_html(body, arguments.fixture)
+    elif arguments.saved.suffix == ".json":
         _trim_json(body, arguments.fixture, arguments.keep)
     else:
         _trim_xml(body, arguments.fixture, arguments.keep)
@@ -86,6 +102,30 @@ def _trim_json(body: bytes, fixture: Path, keep: list[str]) -> None:
     trimmed: Any = kept if wrapper is None else {**wrapper, key: kept}
     fixture.write_text(json.dumps(trimmed, indent=2, ensure_ascii=False) + "\n")
     _report(fixture, [_json_title(item) for item in kept], len(items))
+
+
+def _trim_html(body: bytes, fixture: Path) -> None:
+    tree = lxml.html.fromstring(body)
+    for element in tree.xpath("|".join(f"//{tag}" for tag in HTML_DROPPED_ELEMENTS)):
+        element.drop_tree()
+    for element in tree.iter():
+        for attribute in HTML_DROPPED_ATTRIBUTES:
+            element.attrib.pop(attribute, None)
+    note = (
+        f"<!-- Trimmed: {', '.join(HTML_DROPPED_ELEMENTS)} elements and "
+        f"{', '.join(HTML_DROPPED_ATTRIBUTES)} attributes removed; text and markup otherwise "
+        "as downloaded. -->\n"
+    ).encode()
+    page = lxml.html.tostring(tree, doctype="<!DOCTYPE html>", encoding="utf-8")
+    assert isinstance(page, bytes)  # a str only for encoding="unicode"
+    trimmed = note + page
+    text = extract_main_text(body)
+    if text is None:
+        sys.exit("the saved page has no main text to extract")
+    if extract_main_text(trimmed) != text:
+        sys.exit("trimming would change the extracted main text: nothing written")
+    fixture.write_bytes(trimmed)
+    print(f"{fixture}: {len(body):,} -> {len(trimmed):,} bytes, main text unchanged")
 
 
 def _choose(

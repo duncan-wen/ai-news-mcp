@@ -9,6 +9,7 @@ from typing import Any
 
 import pytest
 from mcp import Client
+from mcp.types import TextContent
 
 from ai_news_mcp.fetcher import FetchError
 from ai_news_mcp.server import create_server
@@ -141,3 +142,16 @@ async def call(client: Client, tool: str, **arguments: Any) -> Any:
     assert not result.is_error, result.content
     assert result.structured_content is not None
     return result.structured_content
+
+
+async def call_error(client: Client, tool: str, **arguments: Any) -> str:
+    """Call a tool that should fail; return the error text a client sees.
+
+    The SDK puts "Error executing tool <name>: " before the tool's own message, so match
+    the message with `in`, not `==`.
+    """
+    result = await client.call_tool(tool, arguments)
+    assert result.is_error, result.structured_content
+    [content] = result.content
+    assert isinstance(content, TextContent)
+    return content.text

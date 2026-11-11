@@ -1,6 +1,6 @@
 Source URLs, auth, rate limits and quirks: `docs/research/ai-news-sources.md` (too long to read whole: grep it by Source name).
 
-Run `scripts/check` (lint, format, types, tests) before committing; CI runs the same script. `scripts/fix` applies the formatter and lint autofixes. Making a fixture: `tests/fixtures/README.md`.
+Run `scripts/check` (lint, format, types, tests) before committing; CI runs the same script. Its pyright result outranks the editor's type diagnostics, which go stale mid-edit. `scripts/fix` applies the formatter and lint autofixes. Making a fixture: `tests/fixtures/README.md`.
 
 ## Agent skills
 
