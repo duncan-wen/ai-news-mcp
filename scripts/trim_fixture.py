@@ -13,8 +13,8 @@ The format goes by the saved file:
   models). Every other field is kept; the fixture is written pretty-printed.
 
 Each `--keep` text must be found in exactly one Item (for JSON, in the element's JSON
-text: a title, or an `objectID` when two Items share a title); the script stops
-otherwise, before writing anything.
+text: a title, or an id field written as JSON, such as `'"id": "org/model"'` or
+`'"objectID": "123"'`); the script stops otherwise, before writing anything.
 """
 
 from __future__ import annotations

@@ -12,6 +12,8 @@ Pre-agreed: the MCP tools only, through the in-memory client (`docs/adr/0004-sin
 
 Issues live in GitHub Issues (private repo duncan-wen/ai-news-mcp), managed via the `gh` CLI. Read one with `gh issue view <n> --json title,body,labels,comments` (`--comments` alone hides the body). See `docs/agents/issue-tracker.md`, also for recording a decision the issue leaves open.
 
+No ticket named: take the lowest-numbered open ready-for-agent issue whose blockers are closed, and state which one you picked before starting.
+
 ### Triage labels
 
 Default five labels: needs-triage, needs-info, ready-for-agent, ready-for-human, wontfix. See `docs/agents/triage-labels.md`.

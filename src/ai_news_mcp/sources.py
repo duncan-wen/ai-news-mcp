@@ -15,7 +15,10 @@ class Category(StrEnum):
 
 SourceKind = Literal["rss", "anthropic-sitemap", "hn-algolia", "hf-models", "openrouter-models"]
 """How a Source's response is read. An `anthropic-sitemap` Source collects only the URLs
-its sitemap did not list before (see Store.newly_listed)."""
+its sitemap did not list before (see Store.newly_listed).
+
+A kind needs an adapter in `adapters.ADAPTERS`, and may be special-cased in
+`Collector._collect_source` (`anthropic-sitemap`, `MODEL_KINDS`)."""
 
 MODEL_KINDS: frozenset[SourceKind] = frozenset({"hf-models", "openrouter-models"})
 """Sources that list models: a model is new only while recently created (Collector)."""

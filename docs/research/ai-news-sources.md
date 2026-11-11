@@ -151,6 +151,7 @@
 **Hugging Face Hub Models** — Verified
 - `?sort=trendingScore`（回傳 trendingScore 欄位）和 `?sort=createdAt&direction=-1` 都實測可用。
 - 新模型列表雜訊很多（例如 `ringtone-ro/...`），需要用 likes、downloads、author 白名單過濾。
+- `sort=trendingScore`（2026-11-11 實測）：前 50 名約 1/3 是其他模型的 GGUF 量化版或 uncensored finetune；有 `createdAt`，沒有 description。
 - Rate limits（https://huggingface.co/docs/hub/rate-limits ，September '25 表格）：Anonymous 每 IP 500 API req / 5 分鐘；Free user 1,000；PRO 2,500。建議一律帶 `HF_TOKEN`。
 
 **OpenRouter Models** — Verified
