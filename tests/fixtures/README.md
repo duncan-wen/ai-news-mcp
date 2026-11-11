@@ -1,6 +1,6 @@
 # Fixtures
 
-Each fixture is a real Source response, trimmed. The fake Fetcher in `tests/conftest.py` serves them by URL (`fetcher.serve(url, "file.xml")`).
+Each fixture is a real Source response, or the original page of an Item (for `read_item`), trimmed. The fake Fetcher in `tests/conftest.py` serves them by URL (`fetcher.serve(url, "file.xml")`).
 
 Making one:
 
@@ -17,6 +17,8 @@ Making one:
 | `openai_rss_next_day.xml` | OpenAI News RSS | 2026-11-11 | 2 Items from `openai_rss.xml` with a tracking query or trailing slash added; 1 Item (9 Nov) not in `openai_rss.xml` |
 | `mistral_rss.xml` | Mistral News RSS | 2026-11-11 | Served as `text/plain`. 6 Items: 4 from 15 Oct to 5 Nov 2026, 1 from 6 Oct, 1 from Sept 2026 |
 | `verge_atom.xml` | The Verge AI Atom | 2026-11-11 | 5 Items, all 10 Nov 2026, with Atom `<content>` |
+| `verge_item_page.html` | The original page of an Item in `verge_atom.xml` (Gemini 4 Carbon) | 2026-11-11 | 391 KB → 71 KB: script, style, svg, noscript, link, iframe, template elements and srcset, sizes, style, data-src attributes removed (noted at the top); the extracted main text is unchanged |
+| `script_only_page.html` | none (hand-made) | 2026-11-11 | A page whose text is rendered by JavaScript: no main text to extract |
 | `anthropic_sitemap.xml` | Anthropic sitemap | 2026-11-11 | 10 of 570 URLs: 3 outside /news/, the /news listing pages (`/news`, `/news/models`, no lastmod), 3 /news/ pages (one with a lastmod from a bulk edit on 19 Oct), 1 /research/ page |
 | `anthropic_sitemap_next_day.xml` | Anthropic sitemap | 2026-11-11 | `anthropic_sitemap.xml` plus 1 /news/ and 1 /research/ URL left out of it, as if newly listed; 1 hand edit: an old /news/ page's lastmod moved to 12 Nov |
 | `hn_algolia.json` | Algolia HN Search (the `hacker-news-ai` Source's query) | 2026-11-11 | Pretty-printed. 6 of 500 hits: 2 not about AI, 2 submissions of one URL, 1 Ask HN with no `url` |

@@ -11,11 +11,20 @@ from pathlib import Path
 from typing import Any, TypeVar
 
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 from pydantic import BaseModel
 
 from .clock import Clock
 from .collector import Collector
-from .fetcher import HOST_INTERVAL, PROJECT_NAME, VERSION, Fetcher, HostPacedFetcher
+from .fetcher import (
+    HOST_INTERVAL,
+    PROJECT_NAME,
+    VERSION,
+    Fetcher,
+    FetchError,
+    HostPacedFetcher,
+)
+from .full_text import extract_main_text
 from .sources import DEFAULT_SOURCES, Category, Source
 from .store import SourceHealth, Store, StoredItem
 
@@ -114,6 +123,13 @@ class SearchResult(BaseModel):
     items: list[ItemView]
 
 
+class FullText(BaseModel):
+    id: int
+    title: str
+    url: str
+    text: str
+
+
 class WhatsNew(BaseModel):
     warning: str | None = None  # first, so that a client reads it before the Items
     items: list[ItemView]
@@ -140,6 +156,15 @@ def failing_sources_warning(
     )
 
 
+def unreadable_message(item: StoredItem, reason: str) -> str:
+    """The error for an Item whose full text cannot be read: its summary and link instead."""
+    summary = f"Its summary: {item.summary} " if item.summary else "It has no summary. "
+    return (
+        f"Could not read the full text of Item {item.id}: {reason}. "
+        f"{summary}Link: {item.original_url}"
+    )
+
+
 def create_server(
     *,
     store_path: Path,
@@ -150,7 +175,8 @@ def create_server(
     host_interval: timedelta = HOST_INTERVAL,
 ) -> MCPServer:
     store = Store(store_path)
-    collector = Collector(sources, store, HostPacedFetcher(fetcher, host_interval), clock)
+    paced_fetcher = HostPacedFetcher(fetcher, host_interval)
+    collector = Collector(sources, store, paced_fetcher, clock)
 
     @asynccontextmanager
     async def lifespan(_: MCPServer) -> AsyncGenerator[None]:
@@ -202,6 +228,28 @@ def create_server(
         Results are newest first, at most 20. Searching never moves a Checkpoint.
         """
         return SearchResult(items=[ItemView.of(item) for item in store.search(query, SEARCH_LIMIT)])
+
+    @tool
+    async def read_item(id: int) -> FullText:
+        """The full text of an Item: fetches its original page and extracts the main text.
+
+        Use when an Item's summary is not enough. `id` is an Item's `id` from `whats_new`
+        or `search`. If the page cannot be fetched or has no main text, the error gives the
+        Item's summary and link instead.
+        """
+        item = store.item(id)
+        if item is None:
+            raise ToolError(f"No Item has id {id}. Use an id from whats_new or search.")
+        try:
+            page = await paced_fetcher.get(item.original_url)
+        except FetchError as error:
+            reason = f"its page could not be fetched ({error})"
+            raise ToolError(unreadable_message(item, reason)) from error
+        text = await asyncio.to_thread(extract_main_text, page)
+        if text is None:
+            reason = "no main text could be extracted from its page"
+            raise ToolError(unreadable_message(item, reason))
+        return FullText(id=item.id, title=item.title, url=item.original_url, text=text)
 
     @tool
     async def whats_new(categories: list[Category] | None = None) -> WhatsNew:

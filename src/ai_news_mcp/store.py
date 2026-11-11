@@ -212,6 +212,18 @@ class Store:
                 )
         return added
 
+    def item(self, item_id: int) -> StoredItem | None:
+        """The Item with this id, or None if there is none."""
+        rows = self._db.execute(
+            """
+            SELECT id, original_url, title, summary, published_at, source_id
+            FROM items
+            WHERE id = ?
+            """,
+            (item_id,),
+        ).fetchall()
+        return next(iter(self._with_categories(rows)), None)
+
     def search(self, query: str, limit: int) -> list[StoredItem]:
         """Items whose title or summary contains query (ASCII case-insensitive), newest first."""
         pattern = "%" + query.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%"
