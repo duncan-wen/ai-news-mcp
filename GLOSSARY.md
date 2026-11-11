@@ -26,8 +26,8 @@ _Avoid_: Settings, feed list
 ### Viewing（查看）
 
 **What's New（新進內容）**:
-The Items collected since the last Checkpoint, going back 7 days at most. A query with no time range returns this.
-自上次 Checkpoint 以來收進的 Items，最多回看 7 天。沒有指定時間範圍的查詢就回傳這個。
+The Items collected since the last Checkpoint and published in the last 7 days. A query with no time range returns this.
+自上次 Checkpoint 以來收進、而且是最近 7 天內發布的 Items。沒有指定時間範圍的查詢就回傳這個。
 _Avoid_: Digest, feed, unread, latest
 
 **Checkpoint（查看點）**:
