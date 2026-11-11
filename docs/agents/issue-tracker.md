@@ -12,7 +12,8 @@ Issues and specs for this repo live as GitHub issues. Use the `gh` CLI for all o
 - **Comment on an issue**: `gh issue comment <number> --body "..."`
 - **Apply / remove labels**: `gh issue edit <number> --add-label "..."` / `--remove-label "..."`
 - **Close**: `gh issue close <number> --comment "..."`
-- **Record an open decision**: when implementing forces behaviour the issue doesn't settle (for example, a case that an old failure path used to cover), post it as a comment headed `## Decisions` (`gh issue comment <number>`) before the review starts, and name it in the final report. A decision made while fixing review findings is added to the same comment (`gh issue comment <number> --edit-last`). The Spec reviewer reads issue comments, so it judges the decision instead of flagging it as scope creep.
+- **Record an open decision**: when implementing forces behaviour the issue doesn't settle (for example, a case that an old failure path used to cover), post it as a comment headed `## Decisions` (`gh issue comment <number>`) before the review starts, and name it in the final report. A decision made while fixing review findings is appended to the same comment. `--edit-last` replaces the whole body, so resend the old body with the new bullets: `body=$(gh api repos/duncan-wen/ai-news-mcp/issues/comments/<comment-id> --jq .body)`, then `gh issue comment <number> --edit-last --body "$body
+- <new decision>"`. The comment id ends the URL that `gh issue comment` printed (`#issuecomment-<comment-id>`). The Spec reviewer reads issue comments, so it judges the decision instead of flagging it as scope creep.
 
 Infer the repo from `git remote -v`; `gh` does this automatically when run inside a clone.
 

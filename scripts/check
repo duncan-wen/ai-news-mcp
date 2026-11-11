@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Runs every automated check: lint, format, types and tests. CI runs this same script.
+# Runs every automated check: lint, format, types, tests and the package build.
+# CI runs this same script.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -7,3 +8,9 @@ uv run ruff check .
 uv run ruff format --check .
 uv run pyright
 uv run pytest
+
+# Builds the sdist, then the wheel from it, as a release does: `uv run`'s editable
+# install skips that path (a file left out of the sdist fails only here).
+build_dir=$(mktemp -d)
+trap 'rm -rf "$build_dir"' EXIT
+uv build --quiet --out-dir "$build_dir"

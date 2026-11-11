@@ -16,7 +16,7 @@ A tool's list parameter (for example `categories`, `sources`) means the default 
 
 ## Name things with the glossary's words
 
-Names of modules, classes, functions, variables, tool parameters and test cases use the terms in `GLOSSARY.md`: Item, Source, Category, What's New, Checkpoint, and the Category names News, Applications, Engineering, Models. Flag any synonym the glossary lists under _Avoid_ (for example `article`, `feed` for a Source, `tag`, `digest`, `research`). A Source's own term for its raw data (an HN story, a sitemap URL) is fine inside that Source's adapter and tests.
+Names of modules, classes, functions, variables, tool parameters and test cases, and the prose of tool descriptions and both READMEs, use the terms in `GLOSSARY.md`: Item, Source, Category, What's New, Checkpoint, and the Category names News, Applications, Engineering, Models. Flag any synonym the glossary lists under _Avoid_ (for example `article`, `feed` for a Source, `tag`, `digest`, `research`). A Source's own term for its raw data (an HN story, a sitemap URL) is fine inside that Source's adapter and tests, and where a doc describes that Source. A format's name (an RSS or Atom feed) is fine wherever it names the format.
 
 ## Keep bilingual docs in step
 
