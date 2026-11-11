@@ -140,8 +140,84 @@ def parse_hn_algolia(body: bytes) -> list[ParsedItem]:
     return items
 
 
+HUGGING_FACE_MODEL_URL = "https://huggingface.co/"
+
+
+def parse_hf_models(body: bytes) -> list[ParsedItem]:
+    """The models in a Hugging Face models API response; raise FormatError otherwise.
+
+    A model links to its page and was published when it was created; one without a
+    creation time is skipped, since it would count as new forever. The response has no
+    description: the summary is the model's task (its pipeline tag), if any.
+    """
+    try:
+        models = json.loads(body)
+    except ValueError as error:
+        raise FormatError(f"not a Hugging Face models response: {error!r}") from error
+    if not isinstance(models, list):
+        raise FormatError("not a Hugging Face models response: not a list")
+    items: list[ParsedItem] = []
+    for model in models:
+        if not isinstance(model, dict):
+            continue
+        model_id = str(model.get("id") or "").strip()
+        created_at = _iso_time(str(model.get("createdAt") or ""))
+        if not model_id or created_at is None:  # without a creation time, never new
+            continue
+        items.append(
+            ParsedItem(
+                url=HUGGING_FACE_MODEL_URL + model_id,
+                title=model_id,
+                summary=str(model.get("pipeline_tag") or ""),
+                published_at=created_at,
+            )
+        )
+    return items
+
+
+OPENROUTER_MODEL_URL = "https://openrouter.ai/"
+
+
+def parse_openrouter_models(body: bytes) -> list[ParsedItem]:
+    """The models in an OpenRouter models API response; raise FormatError otherwise.
+
+    A model links to its page and was published when it was listed (`created`); one
+    without it is skipped, since it would count as new forever. A
+    variant (`:batch`, `:free`) listed beside its model is skipped: it is the same model.
+    A variant listed alone, such as a model only offered free, is kept.
+    """
+    try:
+        models = json.loads(body)["data"]
+    except (ValueError, TypeError, KeyError) as error:
+        raise FormatError(f"not an OpenRouter models response: {error!r}") from error
+    if not isinstance(models, list):
+        raise FormatError("not an OpenRouter models response: `data` is not a list")
+    models = [model for model in models if isinstance(model, dict) and model.get("id")]
+    listed = {str(model["id"]) for model in models}
+    items: list[ParsedItem] = []
+    for model in models:
+        model_id = str(model["id"])
+        base_id, variant_mark, _ = model_id.partition(":")
+        if variant_mark and base_id in listed:
+            continue
+        created = model.get("created")
+        if not isinstance(created, int | float):  # without a listing time, never new
+            continue
+        items.append(
+            ParsedItem(
+                url=OPENROUTER_MODEL_URL + model_id,
+                title=str(model.get("name") or model_id).strip(),
+                summary=str(model.get("description") or "").strip(),
+                published_at=datetime.fromtimestamp(created, UTC),
+            )
+        )
+    return items
+
+
 ADAPTERS: dict[SourceKind, Callable[[bytes], list[ParsedItem]]] = {
     "rss": parse_rss,
     "anthropic-sitemap": parse_anthropic_sitemap,
     "hn-algolia": parse_hn_algolia,
+    "hf-models": parse_hf_models,
+    "openrouter-models": parse_openrouter_models,
 }

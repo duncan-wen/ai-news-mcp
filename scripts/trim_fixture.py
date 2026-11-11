@@ -9,7 +9,8 @@ The format goes by the saved file:
   outside the Items (declaration, namespaces, channel fields) and every kept Item is
   copied unchanged, so the response's quirks survive.
 - JSON (a `.json` file): the Items are the elements of its one top-level array, such as
-  Algolia's `hits`. Every other field is kept; the fixture is written pretty-printed.
+  Algolia's `hits`, or of the document itself when it is an array (Hugging Face
+  models). Every other field is kept; the fixture is written pretty-printed.
 
 Each `--keep` text must be found in exactly one Item (for JSON, in the element's JSON
 text: a title, or an `objectID` when two Items share a title); the script stops
@@ -68,16 +69,22 @@ def _trim_xml(body: bytes, fixture: Path, keep: list[str]) -> None:
 
 
 def _trim_json(body: bytes, fixture: Path, keep: list[str]) -> None:
-    document = json.loads(body)
-    arrays = [key for key, value in document.items() if isinstance(value, list)]
-    if len(arrays) != 1:
-        sys.exit(f"the saved JSON needs exactly one top-level array, not {arrays}")
-    [key] = arrays
-    items: list[Any] = document[key]
+    document: Any = json.loads(body)
+    if isinstance(document, list):  # the document is the array (Hugging Face models)
+        items: list[Any] = document
+        wrapper: dict[str, Any] | None = None
+        key = ""
+    else:
+        wrapper = document
+        arrays = [name for name, value in document.items() if isinstance(value, list)]
+        if len(arrays) != 1:
+            sys.exit(f"the saved JSON needs exactly one top-level array, not {arrays}")
+        [key] = arrays
+        items = document[key]
     kept = _choose(items, keep, lambda item: json.dumps(item, ensure_ascii=False), _json_title)
     kept.sort(key=lambda item: next(i for i, other in enumerate(items) if other is item))
-    document[key] = kept
-    fixture.write_text(json.dumps(document, indent=2, ensure_ascii=False) + "\n")
+    trimmed: Any = kept if wrapper is None else {**wrapper, key: kept}
+    fixture.write_text(json.dumps(trimmed, indent=2, ensure_ascii=False) + "\n")
     _report(fixture, [_json_title(item) for item in kept], len(items))
 
 
@@ -109,7 +116,9 @@ def _xml_title(item: re.Match[bytes]) -> str:
 
 def _json_title(item: Any) -> str:
     return (
-        str(item.get("title") or item.get("url") or "(no title)") if isinstance(item, dict) else "?"
+        str(item.get("title") or item.get("url") or item.get("id") or "(no title)")
+        if isinstance(item, dict)
+        else "?"
     )
 
 

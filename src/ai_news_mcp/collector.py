@@ -10,12 +10,14 @@ from .adapters import ADAPTERS, FormatError
 from .classification import categories_for
 from .clock import Clock
 from .fetcher import Fetcher, FetchError
-from .sources import Source
+from .sources import MODEL_KINDS, Source
 from .store import NewItem, Store
 from .urls import normalize_url
 
 BACKFILL = timedelta(days=30)
 STALE_AFTER = timedelta(hours=24)
+# A listed model counts as new this long after it was created.
+MODEL_NEW_FOR = timedelta(days=30)
 
 
 @dataclass(frozen=True)
@@ -92,6 +94,10 @@ class Collector:
             new_urls = self._store.newly_listed(source.id, list(by_url))
             parsed_items = [parsed for url, parsed in by_url.items() if url in new_urls]
         cutoff = self._store.backfill_from(source.id, default=now - BACKFILL)
+        if source.kind in MODEL_KINDS:
+            # A model trending months after it was created is not new, though created
+            # after the backfill began.
+            cutoff = max(cutoff, now - MODEL_NEW_FOR)
         new_items: list[NewItem] = []
         for parsed in parsed_items:
             published_at = parsed.published_at or now

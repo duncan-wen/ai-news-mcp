@@ -43,3 +43,4 @@ async def test_every_first_version_source_has_default_categories(connect):
     assert {"openai-news", "mistral-news", "the-verge-ai", "anthropic-news"} <= by_category["News"]
     assert {"simon-willison", "vllm-releases"} <= by_category["Engineering"]
     assert by_category["Applications"] == {"product-hunt-ai", "hacker-news-ai"}
+    assert by_category["Models"] == {"hugging-face-models", "openrouter-models"}

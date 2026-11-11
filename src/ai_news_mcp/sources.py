@@ -13,9 +13,12 @@ class Category(StrEnum):
     MODELS = "Models"
 
 
-SourceKind = Literal["rss", "anthropic-sitemap", "hn-algolia"]
+SourceKind = Literal["rss", "anthropic-sitemap", "hn-algolia", "hf-models", "openrouter-models"]
 """How a Source's response is read. An `anthropic-sitemap` Source collects only the URLs
 its sitemap did not list before (see Store.newly_listed)."""
+
+MODEL_KINDS: frozenset[SourceKind] = frozenset({"hf-models", "openrouter-models"})
+"""Sources that list models: a model is new only while recently created (Collector)."""
 
 
 @dataclass(frozen=True)
@@ -43,6 +46,12 @@ HACKER_NEWS_URL = "https://hn.algolia.com/api/v1/search_by_date?" + urlencode(
         "attributesToRetrieve": "title,url,points,created_at,story_text",
         "attributesToHighlight": "none",
     }
+)
+
+# One request per collection, with no key: Hugging Face allows 500 anonymous API requests
+# per IP every 5 minutes, and the Fetcher's spacing (HOST_INTERVAL) keeps a host under 300.
+HUGGING_FACE_MODELS_URL = "https://huggingface.co/api/models?" + urlencode(
+    {"sort": "trendingScore", "direction": -1, "limit": 50}
 )
 
 # The first version's Sources; URLs and quirks: docs/research/ai-news-sources.md.
@@ -152,5 +161,21 @@ DEFAULT_SOURCES: tuple[Source, ...] = (
         "Product Hunt: AI",
         "https://www.producthunt.com/feed?category=artificial-intelligence",
         Category.APPLICATIONS,
+    ),
+    # The most trending models, of which only those created lately are new.
+    Source(
+        id="hugging-face-models",
+        name="Hugging Face: trending models",
+        kind="hf-models",
+        url=HUGGING_FACE_MODELS_URL,
+        default_categories=(Category.MODELS,),
+    ),
+    # Every model it lists, with no key; only those listed lately are new.
+    Source(
+        id="openrouter-models",
+        name="OpenRouter: new models",
+        kind="openrouter-models",
+        url="https://openrouter.ai/api/v1/models",
+        default_categories=(Category.MODELS,),
     ),
 )
