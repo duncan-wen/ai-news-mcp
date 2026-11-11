@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Runs every automated check: lint, format, types, tests and the package build.
+# Runs every automated check: lint, format, types, workflows, tests and the package build.
 # CI runs this same script.
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -10,6 +10,9 @@ uv run pyright
 # CI also runs on macOS and Windows; these catch platform-only APIs (time.tzset) before a push.
 uv run pyright --pythonplatform Darwin
 uv run pyright --pythonplatform Windows
+# Lints .github/workflows. shellcheck is off: CI's runner has it and a laptop may not, so
+# it would fail a push the local run passed.
+uv run actionlint -shellcheck=
 # Makes a text read or write without encoding= fail (pyproject's filterwarnings): Windows'
 # default code page cannot read README.zh-TW.md or GLOSSARY.md.
 PYTHONWARNDEFAULTENCODING=1 uv run pytest

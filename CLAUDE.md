@@ -1,6 +1,8 @@
 Source URLs, auth, rate limits and quirks: `docs/research/ai-news-sources.md` (too long to read whole: grep it by Source name).
 
-Run `scripts/check` (lint, format, types, tests, package build) before committing; CI runs the same script. Its pyright result outranks the editor's type diagnostics, which go stale mid-edit. `scripts/fix` applies the formatter and lint autofixes. Making a fixture: `tests/fixtures/README.md`. Cutting a release: `CONTRIBUTING.md` § Releasing.
+Start work that will become a PR in its own worktree (`git worktree add`): other sessions share this checkout and switch its branch.
+
+Run `scripts/check` (lint, format, types, workflows, tests, package build) before committing; CI runs the same script. Its pyright result outranks the editor's type diagnostics, which go stale mid-edit. `scripts/fix` applies the formatter and lint autofixes. Making a fixture: `tests/fixtures/README.md`. Cutting a release: `CONTRIBUTING.md` § Releasing.
 
 ## Agent skills
 

@@ -12,7 +12,7 @@ You need [uv](https://docs.astral.sh/uv/).
 
 ```sh
 uv sync         # create .venv with the package and the dev tools
-scripts/check   # lint, format, types, tests and the package build, as CI runs them
+scripts/check   # lint, format, types, workflows, tests and the package build, as CI runs them
 scripts/fix     # apply the formatter and lint autofixes
 ```
 
