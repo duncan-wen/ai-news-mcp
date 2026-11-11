@@ -1,21 +1,36 @@
-"""Trim a downloaded RSS or Atom response into a fixture, keeping the chosen Items.
+"""Trim a downloaded response into a fixture, keeping the chosen Items.
 
     uv run scripts/trim_fixture.py SAVED.xml tests/fixtures/NAME.xml \\
         --keep "<title>First title" --keep "<title>Second title"
 
-Every byte outside the Items (declaration, namespaces, channel fields) and every kept
-Item is copied unchanged, so the response's quirks survive. Each `--keep` text must be
-found in exactly one Item; the script stops otherwise, before writing anything.
+The format goes by the saved file:
+
+- RSS `<item>`, Atom `<entry>` or sitemap `<url>` (a `<urlset>` document): every byte
+  outside the Items (declaration, namespaces, channel fields) and every kept Item is
+  copied unchanged, so the response's quirks survive.
+- JSON (a `.json` file): the Items are the elements of its one top-level array, such as
+  Algolia's `hits`. Every other field is kept; the fixture is written pretty-printed.
+
+Each `--keep` text must be found in exactly one Item (for JSON, in the element's JSON
+text: a title, or an `objectID` when two Items share a title); the script stops
+otherwise, before writing anything.
 """
 
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import sys
+from collections.abc import Callable, Sequence
 from pathlib import Path
+from typing import Any, TypeVar
 
-ITEM = re.compile(rb"<(item|entry)[\s>].*?</\1>", re.DOTALL)  # RSS <item>, Atom <entry>
+FEED_ITEM = re.compile(rb"<(item|entry)[\s>].*?</\1>", re.DOTALL)  # RSS <item>, Atom <entry>
+# Only in a sitemap: an RSS channel's <image> also holds a <url>.
+SITEMAP_ITEM = re.compile(rb"<url[\s>].*?</url>", re.DOTALL)
+
+T = TypeVar("T")
 
 
 def main() -> int:
@@ -30,35 +45,72 @@ def main() -> int:
     body = arguments.saved.read_bytes()
     if body[:2] == b"\x1f\x8b":
         sys.exit(f"{arguments.saved} is gzip: download with `curl --compressed`")
-    items = list(ITEM.finditer(body))
+    if arguments.saved.suffix == ".json":
+        _trim_json(body, arguments.fixture, arguments.keep)
+    else:
+        _trim_xml(body, arguments.fixture, arguments.keep)
+    return 0
+
+
+def _trim_xml(body: bytes, fixture: Path, keep: list[str]) -> None:
+    pattern = SITEMAP_ITEM if b"<urlset" in body else FEED_ITEM
+    items = list(pattern.finditer(body))
     if not items:
-        sys.exit(f"{arguments.saved} has no <item> or <entry>")
-
-    kept: list[re.Match[bytes]] = []
-    for text in arguments.keep:
-        matching = [item for item in items if text.encode() in item.group(0)]
-        if len(matching) != 1:
-            titles = [_title(item) for item in matching]
-            sys.exit(f"--keep {text!r} is in {len(matching)} Items, not 1: {titles}")
-        if matching[0] in kept:
-            sys.exit(f"--keep {text!r} picks an Item another --keep already kept")
-        kept.append(matching[0])
+        sys.exit("the saved file has no <item>, <entry> or sitemap <url>")
+    kept = _choose(items, keep, lambda item: item.group(0).decode(errors="replace"), _xml_title)
     kept.sort(key=lambda item: item.start())  # in the response's order
-
-    arguments.fixture.write_bytes(
+    fixture.write_bytes(
         body[: items[0].start()]
         + b"".join(item.group(0) for item in kept)
         + body[items[-1].end() :]
     )
-    print(f"{arguments.fixture}: kept {len(kept)} of {len(items)} Items")
-    for item in kept:
-        print(f"  {_title(item)}")
-    return 0
+    _report(fixture, [_xml_title(item) for item in kept], len(items))
 
 
-def _title(item: re.Match[bytes]) -> str:
-    title = re.search(rb"<title[^>]*>(.*?)</title>", item.group(0), re.DOTALL)
-    return title.group(1).decode(errors="replace").strip() if title else "(no title)"
+def _trim_json(body: bytes, fixture: Path, keep: list[str]) -> None:
+    document = json.loads(body)
+    arrays = [key for key, value in document.items() if isinstance(value, list)]
+    if len(arrays) != 1:
+        sys.exit(f"the saved JSON needs exactly one top-level array, not {arrays}")
+    [key] = arrays
+    items: list[Any] = document[key]
+    kept = _choose(items, keep, lambda item: json.dumps(item, ensure_ascii=False), _json_title)
+    kept.sort(key=lambda item: next(i for i, other in enumerate(items) if other is item))
+    document[key] = kept
+    fixture.write_text(json.dumps(document, indent=2, ensure_ascii=False) + "\n")
+    _report(fixture, [_json_title(item) for item in kept], len(items))
+
+
+def _choose(
+    items: Sequence[T], keep: list[str], text_of: Callable[[T], str], title_of: Callable[[T], str]
+) -> list[T]:
+    kept: list[T] = []
+    for text in keep:
+        matching = [item for item in items if text in text_of(item)]
+        if len(matching) != 1:
+            titles = [title_of(item) for item in matching]
+            sys.exit(f"--keep {text!r} is in {len(matching)} Items, not 1: {titles}")
+        if any(matching[0] is item for item in kept):
+            sys.exit(f"--keep {text!r} picks an Item another --keep already kept")
+        kept.append(matching[0])
+    return kept
+
+
+def _report(fixture: Path, titles: list[str], total: int) -> None:
+    print(f"{fixture}: kept {len(titles)} of {total} Items")
+    for title in titles:
+        print(f"  {title}")
+
+
+def _xml_title(item: re.Match[bytes]) -> str:
+    title = re.search(rb"<(title|loc)[^>]*>(.*?)</\1>", item.group(0), re.DOTALL)
+    return title.group(2).decode(errors="replace").strip() if title else "(no title)"
+
+
+def _json_title(item: Any) -> str:
+    return (
+        str(item.get("title") or item.get("url") or "(no title)") if isinstance(item, dict) else "?"
+    )
 
 
 if __name__ == "__main__":

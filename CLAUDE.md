@@ -1,4 +1,4 @@
-Source URLs, auth, rate limits and quirks: `docs/research/ai-news-sources.md`.
+Source URLs, auth, rate limits and quirks: `docs/research/ai-news-sources.md` (too long to read whole: grep it by Source name).
 
 Run `scripts/check` (lint, format, types, tests) before committing; CI runs the same script. `scripts/fix` applies the formatter and lint autofixes. Making a fixture: `tests/fixtures/README.md`.
 
@@ -10,7 +10,7 @@ Pre-agreed: the MCP tools only, through the in-memory client (`docs/adr/0004-sin
 
 ### Issue tracker
 
-Issues live in GitHub Issues (private repo duncan-wen/ai-news-mcp), managed via the `gh` CLI. See `docs/agents/issue-tracker.md`, also for recording a decision the issue leaves open.
+Issues live in GitHub Issues (private repo duncan-wen/ai-news-mcp), managed via the `gh` CLI. Read one with `gh issue view <n> --json title,body,labels,comments` (`--comments` alone hides the body). See `docs/agents/issue-tracker.md`, also for recording a decision the issue leaves open.
 
 ### Triage labels
 

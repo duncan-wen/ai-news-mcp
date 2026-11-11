@@ -110,6 +110,10 @@ def connect(tmp_path: Path, fetcher: FakeFetcher, clock: FakeClock) -> Callable[
     `fetcher.requests`, only after a collection the test itself waited for, or after
     clearing them.
 
+    Advancing the Clock by exactly 1 day does not make the data stale (it must be over
+    24 hours old), so `whats_new` does not collect then: call `collect_now` to collect the
+    next day's fixture.
+
     Requests to one host are not spaced out unless a test passes `host_interval`: the
     production interval is real time, which the Clock does not control.
     """

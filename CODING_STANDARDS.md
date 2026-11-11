@@ -16,7 +16,7 @@ A tool's list parameter (for example `categories`, `sources`) means the default 
 
 ## Name things with the glossary's words
 
-Names of modules, classes, functions, variables, tool parameters and test cases use the terms in `GLOSSARY.md`: Item, Source, Category, What's New, Checkpoint, and the Category names News, Applications, Engineering, Models. Flag any synonym the glossary lists under _Avoid_ (for example `article`, `feed` for a Source, `tag`, `digest`, `research`).
+Names of modules, classes, functions, variables, tool parameters and test cases use the terms in `GLOSSARY.md`: Item, Source, Category, What's New, Checkpoint, and the Category names News, Applications, Engineering, Models. Flag any synonym the glossary lists under _Avoid_ (for example `article`, `feed` for a Source, `tag`, `digest`, `research`). A Source's own term for its raw data (an HN story, a sitemap URL) is fine inside that Source's adapter and tests.
 
 ## Keep bilingual docs in step
 
