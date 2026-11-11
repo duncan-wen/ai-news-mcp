@@ -15,7 +15,7 @@ jobs:
     needs: check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v7
       - name: Check the tag names the package version
         run: test "${GITHUB_REF_NAME#v}" = "$(uv version --short)"
