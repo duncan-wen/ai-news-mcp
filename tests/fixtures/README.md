@@ -17,3 +17,7 @@ Making one:
 | `openai_rss_next_day.xml` | OpenAI News RSS | 2026-11-11 | 2 Items from `openai_rss.xml` with a tracking query or trailing slash added; 1 Item (9 Nov) not in `openai_rss.xml` |
 | `mistral_rss.xml` | Mistral News RSS | 2026-11-11 | Served as `text/plain`. 6 Items: 4 from 15 Oct to 5 Nov 2026, 1 from 6 Oct, 1 from Sept 2026 |
 | `verge_atom.xml` | The Verge AI Atom | 2026-11-11 | 5 Items, all 10 Nov 2026, with Atom `<content>` |
+| `anthropic_sitemap.xml` | Anthropic sitemap | 2026-11-11 | 10 of 570 URLs: 3 outside /news/, the /news listing pages (`/news`, `/news/models`, no lastmod), 3 /news/ pages (one with a lastmod from a bulk edit on 19 Oct), 1 /research/ page |
+| `anthropic_sitemap_next_day.xml` | Anthropic sitemap | 2026-11-11 | `anthropic_sitemap.xml` plus 1 /news/ and 1 /research/ URL left out of it, as if newly listed; 1 hand edit: an old /news/ page's lastmod moved to 12 Nov |
+| `hn_algolia.json` | Algolia HN Search (the `hacker-news-ai` Source's query) | 2026-11-11 | Pretty-printed. 6 of 500 hits: 2 not about AI, 2 submissions of one URL, 1 Ask HN with no `url` |
+| `hn_algolia_next_day.json` | Algolia HN Search | 2026-11-11 | `hn_algolia.json` plus 1 hit from 6 Nov left out of it, standing in for a story that reached 100 points after the first collection |

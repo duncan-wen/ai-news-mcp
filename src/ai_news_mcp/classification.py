@@ -89,3 +89,23 @@ def categories_for(
     return defaults + tuple(
         category for category in Category if category in found and category not in defaults
     )
+
+
+# Read in the title only, and only words that are about AI on their own: not "agents"
+# (FBI agents), "transformers", "diffusion", "inference" or "Grok" (to grok). A model
+# family name counts only with a version (TITLE_RULES): alone, Opus is also an audio
+# codec and Haiku an operating system.
+AI_RULES: tuple[str, ...] = (
+    r"ai|a\.i|agi|llms?|language models?|machine learning|deep learning|neural networks?",
+    r"agentic|coding agents?|multi-agent|chatbots?|fine-?tun\w*",
+    r"pre-?training|post-?training|open[- ]weights?|model weights|prompt injection|mcp",
+    r"vibe[- ]cod\w*|text-to-(image|video|speech)",
+    r"openai|anthropic|deepmind|hugging ?face|chatgpt|claude|gemini|copilot|codex",
+    r"llama|qwen|deepseek|mistral|kimi",
+)
+_AI_PATTERN = re.compile(r"\b(" + "|".join(AI_RULES) + r")\b", re.IGNORECASE)
+
+
+def is_about_ai(title: str) -> bool:
+    """Whether a title is about AI: an AI keyword, or a model family name with a version."""
+    return bool(_AI_PATTERN.search(title) or _TITLE_PATTERNS[Category.MODELS].search(title))

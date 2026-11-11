@@ -1,0 +1,83 @@
+{
+  "exhaustive": {
+    "nbHits": false,
+    "typo": true
+  },
+  "exhaustiveNbHits": false,
+  "exhaustiveTypo": true,
+  "hits": [
+    {
+      "created_at": "2026-11-10T20:58:44Z",
+      "objectID": "50446246",
+      "points": 101,
+      "title": "Six Math Essentials by Terence Tao",
+      "url": "https://teorth.github.io/tao-web/six-math-essentials.html"
+    },
+    {
+      "created_at": "2026-11-09T18:56:29Z",
+      "objectID": "50429906",
+      "points": 987,
+      "title": "Claude Fable 5.2 and Mythos 5.2",
+      "url": "https://www.anthropic.com/claude-fable-and-mythos-5-2"
+    },
+    {
+      "created_at": "2026-11-09T18:01:10Z",
+      "objectID": "50429068",
+      "points": 872,
+      "title": "Claude Fable 5.2 and Mythos 5.2",
+      "url": "https://www.anthropic.com/claude-fable-and-mythos-5-2"
+    },
+    {
+      "created_at": "2026-11-08T14:49:23Z",
+      "objectID": "50413822",
+      "points": 189,
+      "title": "OpenAI raises $11B at a $1.25T valuation",
+      "url": "https://247wallst.com/investing/2026/11/07/openai-just-raised-11-billion-at-a-1-25-trillion-valuation-below-the-1-4-trillion-it-first-sought/"
+    },
+    {
+      "created_at": "2026-11-05T13:05:28Z",
+      "objectID": "50378625",
+      "points": 495,
+      "title": "Discord is ditching Electron and its new app uses less RAM",
+      "url": "https://www.theverge.com/news/1027379/discord-ditching-electron-web-app"
+    },
+    {
+      "created_at": "2026-11-04T14:37:22Z",
+      "objectID": "50366117",
+      "points": 571,
+      "story_text": "I&#x27;m curious how people on HN are using AI day to day, and came up with a list of questions I thought could be interesting to know. No need to answer every question of course, just wanted to get a gut feel how people are using AI.<p>1) What AI subscriptions are you personally paying for? (Claude, ChatGPT&#x2F;Codex, Cursor, etc)<p>- Which tiers?<p>- Have you purchased multiple subscriptions from the same provider (eg two Claude accounts)?<p>2) Are you using models outside (or instead) of those subscriptions? For example, pay-as-you-go APIs, OpenRouter, or locally hosted models.<p>- Which models and providers?<p>3) What coding harnesses and interfaces are you using? Are you sticking with the default CLIs or IDE integrations, or using alternatives like OpenCode, Pi, Aider, Muse Code, or custom-built harnesses?<p>- What made you switch harnesses (if you switched)?<p>4) Are you using any agent orchestration or swarm tools?<p>- For example, Munder Difflin, Gas Town, Ruflo, or something custom.<p>5) Are you using broader agent platforms like OpenClaw &#x2F; Hermes Agent &#x2F; Grok bot &#x2F; Dots &#x2F; Muse?<p>- If you are using them, what are your main use cases?<p>-----<p>I know my workflow has differed significantly from a year ago, and so it would be interesting to capture a snapshot today of what people are using and why.",
+      "title": "Ask HN: What's your current AI agentic setup?"
+    }
+  ],
+  "hitsPerPage": 500,
+  "nbHits": 181218,
+  "nbPages": 2,
+  "page": 0,
+  "params": "tags=story&numericFilters=points%3E%3D100&hitsPerPage=500&attributesToRetrieve=title%2Curl%2Cpoints%2Ccreated_at%2Cstory_text&attributesToHighlight=none&advancedSyntax=true&analyticsTags=backend",
+  "processingTimeMS": 6,
+  "processingTimingsMS": {
+    "_request": {
+      "roundTrip": 24
+    },
+    "afterFetch": {
+      "format": {
+        "total": 1
+      },
+      "merge": {
+        "mergeLoop": {
+          "prepareNextHit": 1,
+          "total": 1
+        },
+        "total": 1
+      },
+      "total": 1
+    },
+    "fetch": {
+      "scanning": 2,
+      "total": 3
+    },
+    "total": 6
+  },
+  "query": "",
+  "serverTimeMS": 8
+}

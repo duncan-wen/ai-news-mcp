@@ -44,6 +44,11 @@ CREATE TABLE IF NOT EXISTS source_health (
     last_error TEXT,
     consecutive_failures INTEGER NOT NULL
 );
+CREATE TABLE IF NOT EXISTS listed_urls (
+    source_id TEXT NOT NULL,
+    url TEXT NOT NULL,
+    PRIMARY KEY (source_id, url)
+);
 """
 
 
@@ -138,6 +143,26 @@ class Store:
                     "succeeded": succeeded,
                 },
             )
+
+    def newly_listed(self, source_id: str, urls: list[str]) -> set[str]:
+        """Record the URLs a Source lists now; return those it never listed before.
+
+        The first call for a Source returns nothing: what it lists then is already there,
+        not new.
+        """
+        with self._db:
+            listed_before = self._db.execute(
+                "SELECT 1 FROM listed_urls WHERE source_id = ? LIMIT 1", (source_id,)
+            ).fetchone()
+            new: set[str] = set()
+            for url in dict.fromkeys(urls):
+                cursor = self._db.execute(
+                    "INSERT OR IGNORE INTO listed_urls (source_id, url) VALUES (?, ?)",
+                    (source_id, url),
+                )
+                if cursor.rowcount:
+                    new.add(url)
+        return new if listed_before else set()
 
     def source_health(self) -> dict[str, SourceHealth]:
         """The health of every Source with at least one recorded attempt."""

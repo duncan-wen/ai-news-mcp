@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import StrEnum
 from typing import Literal
+from urllib.parse import urlencode
 
 
 class Category(StrEnum):
@@ -12,7 +13,9 @@ class Category(StrEnum):
     MODELS = "Models"
 
 
-SourceKind = Literal["rss"]
+SourceKind = Literal["rss", "anthropic-sitemap", "hn-algolia"]
+"""How a Source's response is read. An `anthropic-sitemap` Source collects only the URLs
+its sitemap did not list before (see Store.newly_listed)."""
 
 
 @dataclass(frozen=True)
@@ -28,6 +31,20 @@ def _rss(id: str, name: str, url: str, *default_categories: Category) -> Source:
     return Source(id=id, name=name, kind="rss", url=url, default_categories=default_categories)
 
 
+HACKER_NEWS_MIN_POINTS = 100
+
+# The most recent stories at HACKER_NEWS_MIN_POINTS or more, about 12 days of them: a story
+# that reaches the threshold days after it was posted is still in the next collection.
+HACKER_NEWS_URL = "https://hn.algolia.com/api/v1/search_by_date?" + urlencode(
+    {
+        "tags": "story",
+        "numericFilters": f"points>={HACKER_NEWS_MIN_POINTS}",
+        "hitsPerPage": 500,
+        "attributesToRetrieve": "title,url,points,created_at,story_text",
+        "attributesToHighlight": "none",
+    }
+)
+
 # The first version's Sources; URLs and quirks: docs/research/ai-news-sources.md.
 DEFAULT_SOURCES: tuple[Source, ...] = (
     _rss("openai-news", "OpenAI News", "https://openai.com/news/rss.xml", Category.NEWS),
@@ -42,6 +59,14 @@ DEFAULT_SOURCES: tuple[Source, ...] = (
         "Google AI (The Keyword)",
         "https://blog.google/innovation-and-ai/technology/ai/rss/",
         Category.NEWS,
+    ),
+    # No RSS: its sitemap's /news/ URLs (not /research/) give the Items.
+    Source(
+        id="anthropic-news",
+        name="Anthropic News",
+        kind="anthropic-sitemap",
+        url="https://www.anthropic.com/sitemap.xml",
+        default_categories=(Category.NEWS,),
     ),
     # Served as text/plain: the adapter must not go by the content type.
     _rss("mistral-news", "Mistral News", "https://mistral.ai/news/rss", Category.NEWS),
@@ -113,6 +138,14 @@ DEFAULT_SOURCES: tuple[Source, ...] = (
         "Transformers releases",
         "https://github.com/huggingface/transformers/releases.atom",
         Category.ENGINEERING,
+    ),
+    # Only the stories whose title is about AI (classification.is_about_ai).
+    Source(
+        id="hacker-news-ai",
+        name="Hacker News: AI",
+        kind="hn-algolia",
+        url=HACKER_NEWS_URL,
+        default_categories=(Category.APPLICATIONS,),
     ),
     _rss(
         "product-hunt-ai",

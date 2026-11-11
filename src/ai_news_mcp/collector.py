@@ -6,7 +6,7 @@ import asyncio
 from dataclasses import dataclass
 from datetime import timedelta
 
-from .adapters import FormatError, parse_rss
+from .adapters import ADAPTERS, FormatError
 from .classification import categories_for
 from .clock import Clock
 from .fetcher import Fetcher, FetchError
@@ -77,7 +77,7 @@ class Collector:
 
     async def _collect_source(self, source: Source) -> SourceReport:
         try:
-            parsed_items = parse_rss(await self._fetcher.get(source.url))
+            parsed_items = ADAPTERS[source.kind](await self._fetcher.get(source.url))
         except (FetchError, FormatError) as error:
             # One broken Source must not stop the others.
             self._store.record_attempt(source.id, self._clock.now(), str(error))
@@ -85,6 +85,12 @@ class Collector:
         # Read after the fetch: an Item must not be stamped earlier than a Checkpoint
         # that whats_new moved while this request was waiting.
         now = self._clock.now()
+        if source.kind == "anthropic-sitemap":
+            # Its lastmod times are edit times: a URL it lists for the first time is the
+            # only sign of a new Item.
+            by_url = {normalize_url(parsed.url): parsed for parsed in parsed_items}
+            new_urls = self._store.newly_listed(source.id, list(by_url))
+            parsed_items = [parsed for url, parsed in by_url.items() if url in new_urls]
         cutoff = self._store.backfill_from(source.id, default=now - BACKFILL)
         new_items: list[NewItem] = []
         for parsed in parsed_items:
