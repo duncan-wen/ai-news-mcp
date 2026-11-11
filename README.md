@@ -1,5 +1,7 @@
 # AI News MCP
 
+<!-- mcp-name: io.github.duncan-wen/ai-news-mcp -->
+
 [繁體中文](https://github.com/duncan-wen/ai-news-mcp/blob/main/README.zh-TW.md)
 
 An MCP server that collects AI news from 23 Sources (company blogs, tech news sites, engineering blogs, release pages, Hacker News, Product Hunt, Hugging Face and OpenRouter) into a local store, and lets Claude ask what's new, search it, and read the full text of an Item.
@@ -45,7 +47,20 @@ git clone https://github.com/duncan-wen/ai-news-mcp.git
 claude mcp add --scope user ai-news -- uv run --directory /path/to/ai-news-mcp ai-news-mcp
 ```
 
-Other MCP clients start it the same way: the command is `uvx ai-news-mcp`, over stdio.
+Other MCP clients start it the same way: the command is `uvx ai-news-mcp`, over stdio. For Claude Desktop, add it to `claude_desktop_config.json` (Settings > Developer > Edit Config; `~/Library/Application Support/Claude/` on macOS, `%APPDATA%\Claude\` on Windows) and restart Claude Desktop:
+
+```json
+{
+  "mcpServers": {
+    "ai-news": {
+      "command": "uvx",
+      "args": ["ai-news-mcp"]
+    }
+  }
+}
+```
+
+If Claude Desktop cannot find `uvx`, give its full path as `command` (the output of `which uvx`, or `where uvx` on Windows).
 
 ## Tools
 
@@ -152,7 +167,7 @@ scripts/fix     # apply the formatter and lint autofixes
 uv build        # build the sdist and wheel into dist/
 ```
 
-Source URLs, rate limits and quirks are in [docs/research/ai-news-sources.md](https://github.com/duncan-wen/ai-news-mcp/blob/main/docs/research/ai-news-sources.md). Coding standards are in [CODING_STANDARDS.md](https://github.com/duncan-wen/ai-news-mcp/blob/main/CODING_STANDARDS.md).
+How to report issues and propose changes is in [CONTRIBUTING.md](https://github.com/duncan-wen/ai-news-mcp/blob/main/CONTRIBUTING.md); changes per release are in [CHANGELOG.md](https://github.com/duncan-wen/ai-news-mcp/blob/main/CHANGELOG.md). Source URLs, rate limits and quirks are in [docs/research/ai-news-sources.md](https://github.com/duncan-wen/ai-news-mcp/blob/main/docs/research/ai-news-sources.md). Coding standards are in [CODING_STANDARDS.md](https://github.com/duncan-wen/ai-news-mcp/blob/main/CODING_STANDARDS.md).
 
 ## License
 

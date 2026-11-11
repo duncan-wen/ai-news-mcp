@@ -29,7 +29,8 @@ async def test_a_source_added_in_the_config_file_is_listed_after_the_built_in_so
 name = "My Blog"
 url = "https://example.com/feed.xml"
 default_categories = ["Engineering", "Applications"]
-"""
+""",
+        encoding="utf-8",
     )
     async with connect(config_path=config_path) as client:
         result = await call(client, "list_sources")
@@ -43,7 +44,7 @@ default_categories = ["Engineering", "Applications"]
 
 
 async def test_a_built_in_source_disabled_in_the_config_file_is_not_listed(connect, config_path):
-    config_path.write_text('disabled = ["mistral-news"]\n')
+    config_path.write_text('disabled = ["mistral-news"]\n', encoding="utf-8")
 
     ids = await source_ids(connect, sources=MISTRAL_AND_THE_VERGE, config_path=config_path)
 
@@ -58,7 +59,8 @@ async def test_a_built_in_source_overridden_in_the_config_file_keeps_its_place_a
 [sources.openai-news]
 url = "https://openai.com/moved/rss.xml"
 default_categories = ["Models"]
-"""
+""",
+        encoding="utf-8",
     )
     async with connect(config_path=config_path) as client:
         result = await call(client, "list_sources")
@@ -109,7 +111,7 @@ url = "https://example.com/feed.xml"
 async def test_a_malformed_config_file_stops_the_server_starting_and_names_the_bad_entry(
     connect, config_path, config, error_mentions
 ):
-    config_path.write_text(config)
+    config_path.write_text(config, encoding="utf-8")
 
     with pytest.raises(SourceConfigError) as error:
         async with connect(config_path=config_path):

@@ -1,6 +1,6 @@
 # Fixtures
 
-Each fixture is a real Source response, or the original page of an Item (for `read_item`), trimmed. The fake Fetcher in `tests/conftest.py` serves them by URL (`fetcher.serve(url, "file.xml")`).
+Each fixture is a real Source response, or the original page of an Item (for `read_item`), trimmed. Its content belongs to its Source and is kept here only for testing. The fake Fetcher in `tests/conftest.py` serves them by URL (`fetcher.serve(url, "file.xml")`).
 
 Making one:
 

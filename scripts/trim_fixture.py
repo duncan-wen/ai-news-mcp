@@ -100,7 +100,7 @@ def _trim_json(body: bytes, fixture: Path, keep: list[str]) -> None:
     kept = _choose(items, keep, lambda item: json.dumps(item, ensure_ascii=False), _json_title)
     kept.sort(key=lambda item: next(i for i, other in enumerate(items) if other is item))
     trimmed: Any = kept if wrapper is None else {**wrapper, key: kept}
-    fixture.write_text(json.dumps(trimmed, indent=2, ensure_ascii=False) + "\n")
+    fixture.write_text(json.dumps(trimmed, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     _report(fixture, [_json_title(item) for item in kept], len(items))
 
 

@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import json
 import re
+import tomllib
 from pathlib import Path
 
 import pytest
@@ -17,12 +19,16 @@ pytestmark = pytest.mark.anyio
 ROOT = Path(__file__).parent.parent
 GLOSSARY = ROOT / "GLOSSARY.md"
 READMES = {"en": ROOT / "README.md", "zh-TW": ROOT / "README.zh-TW.md"}
+PYPROJECT = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]
+SERVER_JSON = ROOT / "server.json"
 
 
 def glossary_definitions(term: str) -> dict[str, str]:
     """A GLOSSARY.md term's definitions: the English and Chinese lines after its heading."""
     match = re.search(
-        rf"^\*\*{re.escape(term)}（[^）]+）\*\*:\n(.+)\n(.+)$", GLOSSARY.read_text(), re.MULTILINE
+        rf"^\*\*{re.escape(term)}（[^）]+）\*\*:\n(.+)\n(.+)$",
+        GLOSSARY.read_text(encoding="utf-8"),
+        re.MULTILINE,
     )
     assert match, f"{term} is not in GLOSSARY.md"
     return {"en": match.group(1), "zh-TW": match.group(2)}
@@ -34,7 +40,7 @@ def collapse_whitespace(text: str) -> str:
 
 def readme_table(language: str, heading: str) -> list[list[str]]:
     """The body rows of the table under the README `## <heading>` section, as cells."""
-    sections = READMES[language].read_text().split("\n## ")
+    sections = READMES[language].read_text(encoding="utf-8").split("\n## ")
     [section] = [s for s in sections if s.startswith(heading)]
     rows = [line for line in section.splitlines() if line.startswith("|")]
     return [[cell.strip() for cell in row.strip("|").split("|")] for row in rows[2:]]
@@ -98,3 +104,33 @@ async def test_readme_gives_the_whats_new_limit(connect, language):
     limit = tools["whats_new"].input_schema["properties"]["limit"]["default"]
     [row] = [row for row in readme_table(language, "Tools") if row[0] == "`whats_new`"]
     assert f" {limit} " in row[1]
+
+
+def readme_code_blocks(language: str, block_language: str) -> list[str]:
+    """The bodies of the README's fenced code blocks opened with ```<block_language>."""
+    text = READMES[language].read_text(encoding="utf-8")
+    return re.findall(rf"^```{block_language}\n(.*?)^```$", text, re.MULTILINE | re.DOTALL)
+
+
+@pytest.mark.parametrize("language", READMES)
+def test_readme_claude_desktop_example_runs_the_package_script(language):
+    [block] = readme_code_blocks(language, "json")
+    [server] = json.loads(block)["mcpServers"].values()
+
+    [script] = PYPROJECT["scripts"]
+    assert [server["command"], *server["args"]] == ["uvx", script]
+
+
+def test_registry_server_json_publishes_this_package_version():
+    server = json.loads(SERVER_JSON.read_text(encoding="utf-8"))
+
+    [package] = server["packages"]
+    assert (package["registryType"], package["identifier"]) == ("pypi", PYPROJECT["name"])
+    assert server["version"] == package["version"] == PYPROJECT["version"]
+
+
+def test_package_readme_names_the_registry_server_for_ownership_checks():
+    server = json.loads(SERVER_JSON.read_text(encoding="utf-8"))
+
+    readme = (ROOT / PYPROJECT["readme"]).read_text(encoding="utf-8")
+    assert f"<!-- mcp-name: {server['name']} -->" in readme

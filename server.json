@@ -1,0 +1,22 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.duncan-wen/ai-news-mcp",
+  "title": "AI News",
+  "description": "Collects AI news from many Sources into a local store for Claude to query. No API key.",
+  "repository": {
+    "url": "https://github.com/duncan-wen/ai-news-mcp",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "ai-news-mcp",
+      "version": "0.1.0",
+      "runtimeHint": "uvx",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}

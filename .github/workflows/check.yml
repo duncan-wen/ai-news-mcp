@@ -2,13 +2,25 @@ name: check
 
 on:
   push:
+    branches: ["**"] # a tag push runs these checks through publish.yml
   pull_request:
+  workflow_call: # publish.yml runs the same checks before it publishes
 
 jobs:
   check:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python: ["3.11", "3.12", "3.13"]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash # scripts/check is bash; Windows runners have Git Bash
     steps:
       - uses: actions/checkout@v5
       - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: ${{ matrix.python }} # sets UV_PYTHON, overriding .python-version
       - run: uv sync --locked
       - run: scripts/check

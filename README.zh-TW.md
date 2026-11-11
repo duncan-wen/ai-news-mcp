@@ -45,7 +45,20 @@ git clone https://github.com/duncan-wen/ai-news-mcp.git
 claude mcp add --scope user ai-news -- uv run --directory /path/to/ai-news-mcp ai-news-mcp
 ```
 
-其他 MCP client 也用同樣方式啟動：指令是 `uvx ai-news-mcp`，透過 stdio 溝通。
+其他 MCP client 也用同樣方式啟動：指令是 `uvx ai-news-mcp`，透過 stdio 溝通。Claude Desktop 的話，把它加進 `claude_desktop_config.json`（Settings > Developer > Edit Config；macOS 在 `~/Library/Application Support/Claude/`，Windows 在 `%APPDATA%\Claude\`），再重新啟動 Claude Desktop：
+
+```json
+{
+  "mcpServers": {
+    "ai-news": {
+      "command": "uvx",
+      "args": ["ai-news-mcp"]
+    }
+  }
+}
+```
+
+如果 Claude Desktop 找不到 `uvx`，就把它的完整路徑寫進 `command`（`which uvx` 的輸出，Windows 上是 `where uvx`）。
 
 ## Tools（工具）
 
@@ -152,7 +165,7 @@ scripts/fix     # 套用格式化與 lint 自動修正
 uv build        # 把 sdist 與 wheel 建置到 dist/
 ```
 
-Source 的網址、速率限制與特殊狀況記在 [docs/research/ai-news-sources.md](https://github.com/duncan-wen/ai-news-mcp/blob/main/docs/research/ai-news-sources.md)，程式規範在 [CODING_STANDARDS.md](https://github.com/duncan-wen/ai-news-mcp/blob/main/CODING_STANDARDS.md)。
+回報問題與提出修改的方式在 [CONTRIBUTING.md](https://github.com/duncan-wen/ai-news-mcp/blob/main/CONTRIBUTING.md)（英文），各版本的變更在 [CHANGELOG.md](https://github.com/duncan-wen/ai-news-mcp/blob/main/CHANGELOG.md)。Source 的網址、速率限制與特殊狀況記在 [docs/research/ai-news-sources.md](https://github.com/duncan-wen/ai-news-mcp/blob/main/docs/research/ai-news-sources.md)，程式規範在 [CODING_STANDARDS.md](https://github.com/duncan-wen/ai-news-mcp/blob/main/CODING_STANDARDS.md)。
 
 ## 授權
 
