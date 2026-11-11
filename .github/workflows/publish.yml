@@ -38,7 +38,9 @@ jobs:
   # The pull-request half of the artifact round trip: publish does the same download on a tag.
   download:
     needs: build
-    if: github.event_name == 'pull_request'
+    # !failure() is needed: without a status function, a job skips when any upstream job
+    # (here check, skipped on a pull request) was skipped.
+    if: ${{ !cancelled() && !failure() && github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v8
