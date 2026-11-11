@@ -10,6 +10,8 @@ Making one:
 4. Mark any hand edit at the edited spot, saying what changed: an XML comment (example: `openai_rss_next_day.xml`). JSON has no comments, so a JSON fixture's hand edits go in its Notes below. Prefer leaving Items out over editing them: a "next day" fixture can be the same download with one more Item kept (example: `hn_algolia_next_day.json`).
 5. Note the download date below. Tests set the Clock relative to it.
 
+To see the Items fixtures collect into, with their publish times and Categories (after keyword classification), as a test's expected values need them: `uv run scripts/fixture_items.py mistral-news=mistral_rss.xml the-verge-ai=verge_atom.xml` (Source id = fixture file).
+
 | File | Source | Downloaded | Notes |
 |---|---|---|---|
 | `openai_rss.xml` | OpenAI News RSS | 2026-11-11 | 8 Items: 6 from 28 Oct to 10 Nov 2026, 2 from June 2026 |
