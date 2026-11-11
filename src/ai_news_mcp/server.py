@@ -6,13 +6,13 @@ import asyncio
 import inspect
 from collections.abc import AsyncGenerator, Awaitable, Callable
 from contextlib import asynccontextmanager
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any, TypeVar
+from typing import Annotated, Any, TypeVar
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from .clock import Clock
 from .collector import Collector
@@ -156,6 +156,13 @@ def failing_sources_warning(
     )
 
 
+def as_utc(moment: datetime | None) -> datetime | None:
+    """A time from a client; one without an offset is taken as UTC."""
+    if moment is None or moment.tzinfo is not None:
+        return moment
+    return moment.replace(tzinfo=UTC)
+
+
 def unreadable_message(item: StoredItem, reason: str) -> str:
     """The error for an Item whose full text cannot be read: its summary and link instead."""
     summary = f"Its summary: {item.summary} " if item.summary else "It has no summary. "
@@ -187,6 +194,7 @@ def create_server(
         finally:
             collector.stop()
 
+    known_source_ids = {source.id for source in sources}
     server = MCPServer(PROJECT_NAME, version=VERSION, lifespan=lifespan)
     tool = async_tool(server)
 
@@ -222,12 +230,42 @@ def create_server(
         )
 
     @tool
-    async def search(query: str) -> SearchResult:
-        """Search stored Items whose title or summary contains `query` (case-insensitive).
+    async def search(
+        query: str | None = None,
+        since: datetime | None = None,
+        until: datetime | None = None,
+        categories: list[Category] | None = None,
+        sources: list[str] | None = None,
+        limit: Annotated[int, Field(ge=1)] = SEARCH_LIMIT,
+    ) -> SearchResult:
+        """Search stored Items by text, publish time, Category and Source, in any mix.
 
-        Results are newest first, at most 20. Searching never moves a Checkpoint.
+        Use for a question about a subject or time span, such as last week's Engineering
+        Items about MCP. Every filter is optional; an omitted one matches every Item.
+        `query`: the title or summary contains it (case-insensitive). `since` / `until`:
+        published at or after `since` and before `until`, ISO 8601; a time without an
+        offset, or a date alone (midnight), is UTC. `categories`: in any of them (News,
+        Applications, Engineering, Models; see `whats_new`). `sources`: from any of these
+        Source ids (see `list_sources`). An empty `categories` or `sources` list matches
+        nothing. Results are newest first, at most `limit` (default 20). Searching never
+        moves a Checkpoint.
         """
-        return SearchResult(items=[ItemView.of(item) for item in store.search(query, SEARCH_LIMIT)])
+        if sources is not None:
+            unknown = [source_id for source_id in sources if source_id not in known_source_ids]
+            if unknown:
+                raise ToolError(
+                    f"No Source has id {', '.join(map(repr, unknown))}. "
+                    f"Known Source ids: {', '.join(sorted(known_source_ids))}."
+                )
+        items = store.search(
+            query=query,
+            since=as_utc(since),
+            until=as_utc(until),
+            categories=categories,
+            source_ids=sources,
+            limit=limit,
+        )
+        return SearchResult(items=[ItemView.of(item) for item in items])
 
     @tool
     async def read_item(id: int) -> FullText:

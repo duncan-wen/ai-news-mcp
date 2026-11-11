@@ -224,18 +224,56 @@ class Store:
         ).fetchall()
         return next(iter(self._with_categories(rows)), None)
 
-    def search(self, query: str, limit: int) -> list[StoredItem]:
-        """Items whose title or summary contains query (ASCII case-insensitive), newest first."""
-        pattern = "%" + query.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%"
+    def search(
+        self,
+        *,
+        query: str | None,
+        since: datetime | None,
+        until: datetime | None,
+        categories: list[Category] | None,
+        source_ids: list[str] | None,
+        limit: int,
+    ) -> list[StoredItem]:
+        """Items matching every given filter, newest first; None means no such filter.
+
+        `query`: the title or summary contains it (ASCII case-insensitive).
+        `since` / `until`: published at or after `since`, and before `until`.
+        `categories` / `source_ids`: in any of them; an empty list matches nothing.
+        """
+        if categories == [] or source_ids == []:
+            return []
+        conditions: list[str] = []
+        parameters: dict[str, object] = {"limit": limit}
+        if query is not None:
+            conditions.append(
+                r"(title LIKE :pattern ESCAPE '\' OR summary LIKE :pattern ESCAPE '\')"
+            )
+            escaped = query.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+            parameters["pattern"] = f"%{escaped}%"
+        if since is not None:
+            conditions.append("published_at >= :since")
+            parameters["since"] = _to_text(since)
+        if until is not None:
+            conditions.append("published_at < :until")
+            parameters["until"] = _to_text(until)
+        if categories is not None:
+            names = _named_placeholders(parameters, "category", [c.value for c in categories])
+            conditions.append(
+                f"id IN (SELECT item_id FROM item_categories WHERE category IN ({names}))"
+            )
+        if source_ids is not None:
+            names = _named_placeholders(parameters, "source", source_ids)
+            conditions.append(f"source_id IN ({names})")
+        where = " AND ".join(conditions) or "1"
         rows = self._db.execute(
-            r"""
+            f"""
             SELECT id, original_url, title, summary, published_at, source_id
             FROM items
-            WHERE title LIKE :pattern ESCAPE '\' OR summary LIKE :pattern ESCAPE '\'
+            WHERE {where}
             ORDER BY published_at DESC, id DESC
             LIMIT :limit
             """,
-            {"pattern": pattern, "limit": limit},
+            parameters,
         ).fetchall()
         return self._with_categories(rows)
 
@@ -299,6 +337,13 @@ class Store:
             )
             for row in rows
         ]
+
+
+def _named_placeholders(parameters: dict[str, object], prefix: str, values: list[str]) -> str:
+    """Add each value to `parameters` under a numbered name; return the names for an IN list."""
+    names = [f"{prefix}{index}" for index in range(len(values))]
+    parameters.update(zip(names, values, strict=True))
+    return ", ".join(f":{name}" for name in names)
 
 
 def _to_text(moment: datetime) -> str:
