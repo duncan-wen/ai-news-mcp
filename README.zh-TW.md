@@ -70,7 +70,7 @@ claude mcp add --scope user ai-news -- uv run --directory /path/to/ai-news-mcp a
 
 每個 Category 有自己的 Checkpoint，所以只問 Models 不會讓當天的 News 被當成已看過。
 
-What's New 裡的每則 Item 只會出現一次：馬上再問一次會是空的，要等下一次收集收進新的 Items。想再看最近的 Items，就改用時間來問（「這週發布了什麼？」），Claude 會呼叫 `search`，它從不移動 Checkpoint。所有連到這個 server 的 client（Claude Code、Claude Desktop、MCP Inspector）共用同一個 store 和同一組 Checkpoint，所以測試時在 Inspector 呼叫 `whats_new`，這些 Items 對 Claude 來說也算看過了。
+What's New 裡的每則 Item 只會出現一次：馬上再問一次會是空的，要等下一次收集收進新的 Items。想再看最近的 Items，就改用時間來問（「這週發布了什麼？」），Claude 會呼叫 `search`，它從不移動 Checkpoint。只有在你問「上次看過之後有什麼新的」時，Claude 才會呼叫 `whats_new`；帶時間（「今天」、「最近」）或帶主題的問題都會用 `search`，所以不會不小心把 Items 標成看過。所有連到這個 server 的 client（Claude Code、Claude Desktop、MCP Inspector）共用同一個 store 和同一組 Checkpoint，所以測試時在 Inspector 呼叫 `whats_new`，這些 Items 對 Claude 來說也算看過了。
 
 這裡用到的名詞定義在 [GLOSSARY.md](https://github.com/duncan-wen/ai-news-mcp/blob/main/GLOSSARY.md)。
 

@@ -70,7 +70,7 @@ Every Item has one or more Categories. A Source gives its default Categories, an
 
 Each Category has its own Checkpoint, so asking only about Models does not mark the day's News as seen.
 
-What's New shows each Item once: ask again and it is empty until the next collection brings new Items. To see recent Items again, ask by time instead ("What was published this week?"): Claude then calls `search`, which never moves a Checkpoint. Every client of the server (Claude Code, Claude Desktop, the MCP Inspector) shares one store and one set of Checkpoints, so calling `whats_new` from the Inspector while testing also marks those Items as seen for Claude.
+What's New shows each Item once: ask again and it is empty until the next collection brings new Items. To see recent Items again, ask by time instead ("What was published this week?"): Claude then calls `search`, which never moves a Checkpoint. Claude calls `whats_new` only when you ask what is new since you last looked; a question with a time span ("today", "recently") or a subject goes to `search`, so it never marks Items as seen by accident. Every client of the server (Claude Code, Claude Desktop, the MCP Inspector) shares one store and one set of Checkpoints, so calling `whats_new` from the Inspector while testing also marks those Items as seen for Claude.
 
 The terms used here are defined in [GLOSSARY.md](https://github.com/duncan-wen/ai-news-mcp/blob/main/GLOSSARY.md).
 

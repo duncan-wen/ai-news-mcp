@@ -277,7 +277,8 @@ def create_server(
         """Search stored Items by text, publish time, Category and Source, in any mix.
 
         Use for a question about a subject or time span, such as last week's Engineering
-        Items about MCP. Every filter is optional; an omitted one matches every Item.
+        Items about MCP or what was published today, and whenever `whats_new` is not
+        clearly asked for. Every filter is optional; an omitted one matches every Item.
         `query`: the title or the whole summary contains it (case-insensitive); a summary
         shown is plain text cut to about 500 characters; `read_item` gives the full text.
         `since` / `until`:
@@ -334,8 +335,11 @@ def create_server(
     ) -> WhatsNew:
         """What's New: Items collected since the last Checkpoint and published in the last 7 days.
 
-        Use when the user asks what's new in AI, or what's new in some Categories; for a
-        subject or a time span use `search` instead. Each Category has its own Checkpoint;
+        Use only when the user asks for what is new since they last looked: what's new in
+        AI or in some Categories, anything new, today's briefing. Calling it marks Items as
+        seen and cannot be undone, so for anything else use `search`, which never does: a
+        time span ("today", "recently", "this week"), a subject ("what's new with MCP"), or
+        when unsure. Each Category has its own Checkpoint;
         only the Checkpoints of the Categories asked about (omitted: all) move to now, so
         Items shown once are not shown again. Every client of this server shares the
         Checkpoints. `previous_checkpoints` gives each asked Category's Checkpoint before this
