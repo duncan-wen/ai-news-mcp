@@ -1,6 +1,6 @@
 [project]
 name = "ai-news-mcp"
-version = "0.1.0"
+version = "0.2.0"
 description = "MCP server that collects AI news from many Sources into a local store for Claude to query."
 authors = [
     { name = "Duncan WEN", email = "lumpa7223@gmail.com" }

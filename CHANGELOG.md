@@ -2,7 +2,7 @@
 
 Notable changes in each release. Versions follow [Semantic Versioning](https://semver.org/); until 1.0.0, a minor version can change the tools or the `sources.toml` format.
 
-## Unreleased
+## 0.2.0
 
 - `search` takes `summary_length` to shorten the summaries it shows (0: none).
 - `read_item` returns the first `max_length` characters (default 10,000), with no marker added, and reports `truncated` and `full_length`.
