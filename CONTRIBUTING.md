@@ -32,6 +32,10 @@ Run `scripts/check` before every commit; CI runs the same script on Linux, macOS
 
 If `publish.yml` fails at the artifact upload or download, suspect a recent Dependabot upgrade of those actions.
 
+## Demo GIF
+
+The READMEs show `docs/assets/demo.gif`, a Claude Code session using the published package. After a change to what the tools return, re-record it: `demo/record.sh` (needs `vhs`, `ttyd`, `ffmpeg` and a signed-in Claude Code; each run spends Claude tokens), check `demo/out/demo.mp4`, then copy `demo/out/demo.gif` to `docs/assets/`. The recording uses its own store under `/tmp/ai-news-demo`, so your Checkpoints stay put. Answers come from the day's news: re-record when a headline would be out of place.
+
 ## Security
 
 Do not open a public issue for a vulnerability: see [SECURITY.md](SECURITY.md).

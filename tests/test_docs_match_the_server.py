@@ -158,3 +158,19 @@ def test_package_readme_names_the_registry_server_for_ownership_checks():
 
     readme = (ROOT / PYPROJECT["readme"]).read_text(encoding="utf-8")
     assert f"<!-- mcp-name: {server['name']} -->" in readme
+
+
+REPO_FILES_URL = "https://raw.githubusercontent.com/duncan-wen/ai-news-mcp/main/"
+
+
+@pytest.mark.parametrize("language", READMES)
+def test_readme_images_load_on_pypi_too(language):
+    # PyPI shows README.md without the repo beside it, so a relative image path breaks there.
+    text = READMES[language].read_text(encoding="utf-8")
+    images = re.findall(r'<img [^>]*src="([^"]+)"|!\[[^\]]*\]\(([^)]+)\)', text)
+    urls = [html or markdown for html, markdown in images]
+
+    assert urls  # the demo GIF
+    for url in urls:
+        assert url.startswith(REPO_FILES_URL)
+        assert (ROOT / url.removeprefix(REPO_FILES_URL)).is_file()
