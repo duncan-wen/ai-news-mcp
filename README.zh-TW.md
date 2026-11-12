@@ -8,6 +8,8 @@
 
 **適合你嗎？** 如果你想讓 Claude 幫你整理 AI 動態，不用自己逛十幾個網站，也能接受 Claude 讀取公開 Source 上 Items 的標題與摘要，就適合。它不是有自己介面的新聞閱讀器，不會自己摘要 Items，也不會合併同一事件的 Items，也只知道它的 Source 發布過的內容。
 
+<img width="1280" alt="在 Claude Code 裡問 ai-news-mcp：Models 和 Engineering 有什麼新的、搜尋 MCP 相關文章，再讀其中一篇全文並摘要" src="https://raw.githubusercontent.com/duncan-wen/ai-news-mcp/main/docs/assets/demo.gif" />
+
 ## 功能
 
 - **What's New（新進內容）**：依 Category 列出你上次查看之後收進、而且是最近 7 天內發布的所有內容。

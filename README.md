@@ -10,6 +10,8 @@ It runs on your machine. It needs no API key, no scheduler and no cloud service,
 
 **Is it for you?** Use it if you want Claude to brief you on AI news without you visiting a dozen sites, and you are fine with Claude reading the titles and summaries of Items from public Sources. It is not a news reader with its own interface, it does not summarise Items or merge Items about the same event itself, and it only knows what its Sources publish.
 
+<img width="1280" alt="Claude Code asks ai-news-mcp what's new in Models and Engineering, searches for MCP articles, then reads one in full and summarises it" src="https://raw.githubusercontent.com/duncan-wen/ai-news-mcp/main/docs/assets/demo.gif" />
+
 ## What it does
 
 - **What's New**: everything collected since you last asked, per Category, that was published in the last 7 days.
