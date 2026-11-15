@@ -172,5 +172,6 @@ def test_readme_images_load_on_pypi_too(language):
 
     assert urls  # the demo GIF
     for url in urls:
-        assert url.startswith(REPO_FILES_URL)
-        assert (ROOT / url.removeprefix(REPO_FILES_URL)).is_file()
+        assert url.startswith("https://")
+        if url.startswith(REPO_FILES_URL):
+            assert (ROOT / url.removeprefix(REPO_FILES_URL)).is_file()

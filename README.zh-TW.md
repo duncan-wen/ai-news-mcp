@@ -2,6 +2,9 @@
 
 [English](https://github.com/duncan-wen/ai-news-mcp/blob/main/README.md)
 
+[![AI News MCP server](https://mcprush.com/badge/ai-news-mcp/card.svg?theme=light)](https://mcprush.com/to/ai-news-mcp?ref=badge)
+[![M8ven Score](https://m8ven.ai/badge/mcp/duncan-wen-ai-news-mcp-1fvktq?variant=verified)](https://m8ven.ai/mcp/duncan-wen-ai-news-mcp-1fvktq?s=readme)
+
 一個 MCP server：從 23 個 Source（公司部落格、科技新聞網站、工程部落格、版本發布頁、Hacker News、Product Hunt、Hugging Face 與 OpenRouter）收集 AI 動態存進本機，讓 Claude 查詢有什麼新進內容、搜尋，以及讀取 Item 的全文。
 
 它在你自己的電腦上執行，不需要 API key、排程器或任何雲端服務，也從不呼叫 LLM：你提問時，由 Claude 負責整理摘要。任何 MCP client（Claude Code、Claude Desktop、Cursor、VS Code 等）都能用，搭配該 client 使用的模型；文件以 Claude 為例，因為測試是在 Claude 上做的。
