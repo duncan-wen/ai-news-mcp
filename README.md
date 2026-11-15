@@ -4,6 +4,8 @@
 
 [繁體中文](https://github.com/duncan-wen/ai-news-mcp/blob/main/README.zh-TW.md)
 
+[![AI News MCP server](https://mcprush.com/badge/ai-news-mcp/card.svg?theme=light)](https://mcprush.com/to/ai-news-mcp?ref=badge)
+
 An MCP server that collects AI news from 23 Sources (company blogs, tech news sites, engineering blogs, release pages, Hacker News, Product Hunt, Hugging Face and OpenRouter) into a local store, and lets Claude ask what's new, search it, and read the full text of an Item.
 
 It runs on your machine. It needs no API key, no scheduler and no cloud service, and it never calls an LLM: Claude does the summarising when you ask. It works in any MCP client (Claude Code, Claude Desktop, Cursor, VS Code and others) with the model that client uses; these docs say Claude because Claude is what it is tested with.
