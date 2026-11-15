@@ -2,6 +2,11 @@
 
 Notable changes in each release. Versions follow [Semantic Versioning](https://semver.org/); until 1.0.0, a minor version can change the tools or the `sources.toml` format.
 
+## 0.2.1
+
+- Every tool sets the four MCP annotation hints (`readOnlyHint`, `destructiveHint`, `idempotentHint`, `openWorldHint`): `list_sources`, `search` and `read_item` are read-only; `collect_now` and `whats_new` only add or move state, never delete.
+- The READMEs show the mcprush and M8ven badges.
+
 ## 0.2.0
 
 - `search` takes `summary_length` to shorten the summaries it shows (0: none).
