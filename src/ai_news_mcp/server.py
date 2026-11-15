@@ -12,6 +12,7 @@ from typing import Annotated, Any, TypeVar
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import ToolAnnotations
 from pydantic import BaseModel, Field
 
 from .classification import plain_text
@@ -45,23 +46,35 @@ STILL_COLLECTING = (
     "Call whats_new again in a minute or two for the rest."
 )
 FAILURES_BEFORE_WARNING = 3
+READS_THE_STORE = ToolAnnotations(
+    read_only_hint=True,
+    destructive_hint=False,
+    idempotent_hint=True,
+    open_world_hint=False,
+)
 
 ToolFunction = TypeVar("ToolFunction", bound=Callable[..., Awaitable[Any]])
 
 
-def async_tool(server: MCPServer) -> Callable[[ToolFunction], ToolFunction]:
-    """Register a tool, refusing plain `def` functions.
+def async_tool(
+    server: MCPServer,
+) -> Callable[[ToolAnnotations], Callable[[ToolFunction], ToolFunction]]:
+    """Register a tool with its annotations, refusing plain `def` functions.
 
     The SDK runs sync tools on a worker thread, but the Store's SQLite connection
-    only works on the event loop thread that opened it.
+    only works on the event loop thread that opened it. Every tool sets all four hints:
+    some MCP directories reject a tool missing any.
     """
 
-    def register(function: ToolFunction) -> ToolFunction:
-        if not inspect.iscoroutinefunction(function):
-            raise TypeError(f"Tool {function.__name__!r} must be `async def`: see async_tool")
-        return server.tool()(function)
+    def with_annotations(annotations: ToolAnnotations) -> Callable[[ToolFunction], ToolFunction]:
+        def register(function: ToolFunction) -> ToolFunction:
+            if not inspect.iscoroutinefunction(function):
+                raise TypeError(f"Tool {function.__name__!r} must be `async def`: see async_tool")
+            return server.tool(annotations=annotations)(function)
 
-    return register
+        return register
+
+    return with_annotations
 
 
 class SourceCollectReport(BaseModel):
@@ -246,7 +259,15 @@ def create_server(
     server = MCPServer(PROJECT_NAME, version=VERSION, lifespan=lifespan)
     tool = async_tool(server)
 
-    @tool
+    # Collecting only adds Items, but each call can find new ones on the Sources' sites.
+    @tool(
+        ToolAnnotations(
+            read_only_hint=False,
+            destructive_hint=False,
+            idempotent_hint=False,
+            open_world_hint=True,
+        )
+    )
     async def collect_now() -> CollectReport:
         """Collect new Items from every Source now.
 
@@ -265,7 +286,7 @@ def create_server(
             ],
         )
 
-    @tool
+    @tool(READS_THE_STORE)
     async def list_sources() -> SourceList:
         """Every Source with its URL, default Categories and collection state.
 
@@ -279,7 +300,7 @@ def create_server(
             sources=[SourceView.of(source, health.get(source.id)) for source in sources]
         )
 
-    @tool
+    @tool(READS_THE_STORE)
     async def search(
         query: str | None = None,
         since: datetime | None = None,
@@ -322,7 +343,15 @@ def create_server(
         )
         return SearchResult(items=[ItemView.of(item, summary_length) for item in items])
 
-    @tool
+    # Fetches the Item's page from its site but stores nothing.
+    @tool(
+        ToolAnnotations(
+            read_only_hint=True,
+            destructive_hint=False,
+            idempotent_hint=True,
+            open_world_hint=True,
+        )
+    )
     async def read_item(
         id: int,
         max_length: Annotated[int, Field(ge=1)] = READ_ITEM_LENGTH,
@@ -358,7 +387,16 @@ def create_server(
             full_length=len(text),
         )
 
-    @tool
+    # Moves Checkpoints, so a second call shows other Items; it may collect first. Not
+    # destructive: Items it marks as seen stay findable with `search`.
+    @tool(
+        ToolAnnotations(
+            read_only_hint=False,
+            destructive_hint=False,
+            idempotent_hint=False,
+            open_world_hint=True,
+        )
+    )
     async def whats_new(
         categories: list[Category] | None = None,
         limit: Annotated[int, Field(ge=1)] = WHATS_NEW_LIMIT,
