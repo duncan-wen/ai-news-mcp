@@ -5,7 +5,7 @@
 [繁體中文](https://github.com/duncan-wen/ai-news-mcp/blob/main/README.zh-TW.md)
 
 [![AI News MCP server](https://mcprush.com/badge/ai-news-mcp/card.svg?theme=light)](https://mcprush.com/to/ai-news-mcp?ref=badge)
-[![M8ven Score](https://m8ven.ai/badge/mcp/duncan-wen-ai-news-mcp-1fvktq)](https://m8ven.ai/mcp/duncan-wen-ai-news-mcp-1fvktq?s=readme)
+[![M8ven Score](https://m8ven.ai/badge/mcp/duncan-wen-ai-news-mcp-1fvktq?variant=verified)](https://m8ven.ai/mcp/duncan-wen-ai-news-mcp-1fvktq?s=readme)
 
 An MCP server that collects AI news from 23 Sources (company blogs, tech news sites, engineering blogs, release pages, Hacker News, Product Hunt, Hugging Face and OpenRouter) into a local store, and lets Claude ask what's new, search it, and read the full text of an Item.
 
