@@ -8,6 +8,7 @@ import pytest
 from .conftest import (
     MISTRAL_AND_THE_VERGE,
     OPENAI_NEWS,
+    OPENAI_NEWS_URL,
     call,
     call_error,
     first_version_source,
@@ -198,3 +199,38 @@ async def test_search_limit_below_1_is_refused(connect):
         error = await call_error(client, "search", limit=0)
 
     assert "limit" in error
+
+
+async def test_search_pages_by_until_without_splitting_items_published_at_one_time(
+    connect, fetcher
+):
+    # Its 6 Items from the last 30 days: 2 published 10 Nov 09:00, 2 published 10 Nov 07:00,
+    # then 28 Oct 19:40:49 and 28 Oct 13:15.
+    fetcher.serve(OPENAI_NEWS_URL, "openai_rss_same_times.xml")
+    async with connect() as client:
+        await call(client, "collect_now")
+        pages = [await call(client, "search", limit=3)]
+        while pages[-1]["more"]:
+            until = pages[-1]["items"][-1]["published_at"]
+            pages.append(await call(client, "search", limit=3, until=until))
+
+    # The 3rd Item would split the 07:00 pair, so the first page waits for it.
+    assert [[item["published_at"] for item in page["items"]] for page in pages] == [
+        ["2026-11-10T09:00:00Z", "2026-11-10T09:00:00Z"],
+        ["2026-11-10T07:00:00Z", "2026-11-10T07:00:00Z", "2026-10-28T19:40:49Z"],
+        ["2026-10-28T13:15:00Z"],
+    ]
+    assert [page["more"] for page in pages] == [4, 1, 0]
+
+
+async def test_search_goes_over_its_limit_rather_than_split_the_newest_items(connect, fetcher):
+    fetcher.serve(OPENAI_NEWS_URL, "openai_rss_same_times.xml")
+    async with connect() as client:
+        await call(client, "collect_now")
+        result = await call(client, "search", limit=1)
+
+    assert [item["published_at"] for item in result["items"]] == [
+        "2026-11-10T09:00:00Z",
+        "2026-11-10T09:00:00Z",
+    ]
+    assert result["more"] == 4
