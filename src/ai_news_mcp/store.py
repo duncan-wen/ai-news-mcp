@@ -273,28 +273,30 @@ class Store:
             names = _named_placeholders(parameters, "source", source_ids)
             conditions.append(f"source_id IN ({names})")
         where = " AND ".join(conditions) or "1"
-        [(total,)] = self._db.execute(
-            f"SELECT COUNT(*) FROM items WHERE {where}", parameters
-        ).fetchall()
-        # The `limit`-th newest match's publish time; with fewer matches, every match.
+        # One statement, so that `total` counts the same matches the rows come from even
+        # while another server process sharing the store writes a collection.
         rows = self._db.execute(
             f"""
-            SELECT id, original_url, title, summary, published_at, source_id
-            FROM items
-            WHERE {where} AND published_at >= COALESCE(
-                (
-                    SELECT published_at FROM items
-                    WHERE {where}
-                    ORDER BY published_at DESC, id DESC
-                    LIMIT 1 OFFSET :limit - 1
-                ),
-                ''
+            WITH matches AS (
+                SELECT id, original_url, title, summary, published_at, source_id,
+                    COUNT(*) OVER () AS total
+                FROM items
+                WHERE {where}
+            ),
+            cut AS (  -- the `limit`-th newest match; with fewer matches, none
+                SELECT published_at FROM matches
+                ORDER BY published_at DESC, id DESC
+                LIMIT 1 OFFSET :limit - 1
             )
+            SELECT id, original_url, title, summary, published_at, source_id, total
+            FROM matches
+            WHERE published_at >= COALESCE((SELECT published_at FROM cut), '')
             ORDER BY published_at DESC, id DESC
             """,
             parameters,
         ).fetchall()
-        return SearchMatches(items=self._with_categories(rows), total=total)
+        total = rows[0][6] if rows else 0
+        return SearchMatches(items=self._with_categories([row[:6] for row in rows]), total=total)
 
     def collected_after(
         self, since: dict[Category, datetime | None], published_since: datetime
