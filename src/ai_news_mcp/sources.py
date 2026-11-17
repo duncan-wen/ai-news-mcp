@@ -18,7 +18,8 @@ SourceKind = Literal["rss", "anthropic-sitemap", "hn-algolia", "hf-models", "ope
 its sitemap did not list before (see Store.newly_listed).
 
 A kind needs an adapter in `adapters.ADAPTERS`, and may be special-cased in
-`Collector._collect_source` (`anthropic-sitemap`, `MODEL_KINDS`)."""
+`Collector._collect_source` (`anthropic-sitemap`, `MODEL_KINDS`) and in
+`urls.same_item_key` (`openrouter-models`)."""
 
 MODEL_KINDS: frozenset[SourceKind] = frozenset({"hf-models", "openrouter-models"})
 """Sources that list models: a model is new only while recently created (Collector)."""
