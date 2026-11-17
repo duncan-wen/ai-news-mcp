@@ -1,8 +1,10 @@
 name: check
 
 on:
+  # A branch is checked through its pull request: a push run as well would run the matrix
+  # twice per commit. A tag push runs these checks through publish.yml.
   push:
-    branches: ["**"] # a tag push runs these checks through publish.yml
+    branches: [main]
   pull_request:
   workflow_call: # publish.yml runs the same checks before it publishes
 
