@@ -91,7 +91,7 @@
 
 **Hugging Face Blog** — Verified：`https://huggingface.co/blog/feed.xml` → 200，901 items（全歷史），description 幾乎是空的，只有標題和連結。
 
-**TechCrunch AI** — Verified：`https://techcrunch.com/category/artificial-intelligence/feed/` → 200，20 items，摘要。
+**TechCrunch AI** — Verified：`https://techcrunch.com/category/artificial-intelligence/feed/` → 200，20 items，摘要。文章更新後會換到帶新日期的網址（`/2026/11/10/<slug>` → `/2026/11/12/<slug>`），`pubDate` 也跟著變；collector 把路徑只差日期的網址當成同一則 Item。
 
 **The Verge AI** — Verified：`https://www.theverge.com/rss/ai-artificial-intelligence/index.xml` → 200 Atom，10 items，`<content>` avg ~960 字元（部分內文）。
 

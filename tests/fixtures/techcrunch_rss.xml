@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	>
+
+<channel>
+	<title>AI News &amp; Artificial Intelligence | TechCrunch</title>
+	<atom:link href="https://techcrunch.com/category/artificial-intelligence/feed/" rel="self" type="application/rss+xml" />
+	<link>https://techcrunch.com/category/artificial-intelligence/</link>
+	<description>Startup and Technology News</description>
+	<lastBuildDate>Tue, 17 Nov 2026 16:45:08 +0000</lastBuildDate>
+	<language>en-US</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.9.11</generator>
+
+<image>
+	<url>https://techcrunch.com/wp-content/uploads/2015/02/cropped-cropped-favicon-gradient.png?w=32</url>
+	<title>AI News &amp; Artificial Intelligence | TechCrunch</title>
+	<link>https://techcrunch.com/category/artificial-intelligence/</link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Voyage Labs raises $12 million for a specialized AI travel assistant</title>
+		<link>https://techcrunch.com/2026/11/17/voyage-labs-raises-12-million-for-a-specialized-ai-travel-assistant/</link>
+		
+		<dc:creator><![CDATA[Russell Brandom]]></dc:creator>
+		<pubDate>Tue, 17 Nov 2026 15:00:00 +0000</pubDate>
+				<category><![CDATA[AI]]></category>
+		<category><![CDATA[AI assistant]]></category>
+		<category><![CDATA[Google Maps]]></category>
+		<category><![CDATA[travel]]></category>
+		<guid isPermaLink="false">https://techcrunch.com/?p=3188450</guid>
+
+					<description><![CDATA[Voyage Labs’ flagship product is called Atlas, meant to work as a personal assistant for your trip-planning, available today in private beta.]]></description>
+		
+		
+		
+			</item><item>
+		<title>Isomorphic Labs raises $5B as it looks to take drug candidates to clinical trials</title>
+		<link>https://techcrunch.com/2026/11/17/isomorphic-labs-raises-5b-as-it-looks-to-take-drug-candidates-to-clinical-trials/</link>
+		
+		<dc:creator><![CDATA[Ram Iyer]]></dc:creator>
+		<pubDate>Tue, 17 Nov 2026 14:50:58 +0000</pubDate>
+				<category><![CDATA[AI]]></category>
+		<category><![CDATA[Biotech & Health]]></category>
+		<category><![CDATA[Fundraising]]></category>
+		<category><![CDATA[AI drug discovery]]></category>
+		<category><![CDATA[DeepMind]]></category>
+		<category><![CDATA[drug research]]></category>
+		<category><![CDATA[isomorphic labs]]></category>
+		<guid isPermaLink="false">https://techcrunch.com/?p=3189440</guid>
+
+					<description><![CDATA[Isomorphic Labs, the AI drug-discovery platform that was spun out of Google’s DeepMind in 2021, has raised $5 Billion in a Series C funding round.]]></description>
+		
+		
+		
+			</item><item>
+		<title>Cybersecurity AI startup Corma reaches $1B valuation in about 3 months</title>
+		<link>https://techcrunch.com/2026/11/16/cybersecurity-ai-startup-corma-reaches-1b-valuation-in-about-3-months/</link>
+		
+		<dc:creator><![CDATA[Julie Bort]]></dc:creator>
+		<pubDate>Mon, 16 Nov 2026 23:32:32 +0000</pubDate>
+				<category><![CDATA[AI]]></category>
+		<category><![CDATA[Fundraising]]></category>
+		<category><![CDATA[Security]]></category>
+		<category><![CDATA[Startups]]></category>
+		<category><![CDATA[cybersecurity]]></category>
+		<category><![CDATA[In Brief]]></category>
+		<guid isPermaLink="false">https://techcrunch.com/?p=3189297</guid>
+
+					<description><![CDATA[Three months since introducing its product, AI cybersecurity startup Corba has raised a $125 million Series A at a $1 billion valuation led by NEA.]]></description>
+		
+		
+		
+			</item>
+	</channel>
+</rss>

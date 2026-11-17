@@ -12,7 +12,7 @@ from .clock import Clock
 from .fetcher import Fetcher, FetchError
 from .sources import MODEL_KINDS, Source
 from .store import NewItem, Store
-from .urls import normalize_url
+from .urls import normalize_url, same_item_key
 
 BACKFILL = timedelta(days=30)
 STALE_AFTER = timedelta(hours=24)
@@ -98,14 +98,19 @@ class Collector:
             # A model trending months after it was created is not new, though created
             # after the backfill began.
             cutoff = max(cutoff, now - MODEL_NEW_FOR)
+        stored = {same_item_key(url, source) for url in self._store.item_urls(source.id)}
         new_items: list[NewItem] = []
         for parsed in parsed_items:
             published_at = parsed.published_at or now
-            if published_at < cutoff:
+            url = normalize_url(parsed.url)
+            key = same_item_key(url, source)
+            # An Item listed again under another URL adds nothing: the first one is kept.
+            if published_at < cutoff or key in stored:
                 continue
+            stored.add(key)
             new_items.append(
                 NewItem(
-                    url=normalize_url(parsed.url),
+                    url=url,
                     original_url=parsed.url,
                     title=parsed.title,
                     summary=parsed.summary,

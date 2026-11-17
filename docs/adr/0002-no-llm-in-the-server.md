@@ -5,7 +5,7 @@ At collection time, Categories are assigned without an LLM: each Item gets its S
 ## Consequences
 
 - Keyword rules will misclassify some Items. We accept this, because an Item can have several Categories and Claude can re-judge at query time.
-- De-duplication only merges Items whose normalised URLs match. Different reports of the same event are kept as separate Items for Claude to group.
+- De-duplication only merges Items whose normalised URLs match, or that one Source lists again under a URL that differs in a known way: a `/YYYY/MM/DD` date segment on the Source's own site (TechCrunch moves an updated Item to a URL with the new date), or an OpenRouter variant (`:free`, `:batch`) of a model. Different reports of the same event are kept as separate Items for Claude to group.
 - To keep that grouping cheap, the tools let a client ask for less text (`summary_length`), so it can read a week of Items by title.
 
 ## Considered Options
@@ -23,7 +23,7 @@ At collection time, Categories are assigned without an LLM: each Item gets its S
 ### 影響
 
 - 關鍵字規則會把一些 Item 分錯類。我們接受這一點，因為一則 Item 可以有多個 Category，Claude 在查詢時也能重新判斷。
-- 去重複只合併正規化後網址相同的 Item。同一事件的不同報導會保留成不同的 Item，交給 Claude 歸納。
+- 去重複只合併正規化後網址相同的 Item，或同一個 Source 換了已知差異的網址重新列出的 Item：Source 自家網站上路徑只差一段 `/YYYY/MM/DD` 日期（TechCrunch 更新文章後會把它搬到帶新日期的網址），或 OpenRouter 模型的變體（`:free`、`:batch`）。同一事件的不同報導會保留成不同的 Item，交給 Claude 歸納。
 - 為了讓歸納便宜，tool 讓 client 可以要求少一點文字（`summary_length`），只看標題就能讀完一週的 Item。
 
 ### 考慮過的選項

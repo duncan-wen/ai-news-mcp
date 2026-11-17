@@ -188,6 +188,11 @@ class Store:
             )
         }
 
+    def item_urls(self, source_id: str) -> list[str]:
+        """The normalised URLs of the Items stored from this Source."""
+        rows = self._db.execute("SELECT url FROM items WHERE source_id = ?", (source_id,))
+        return [url for (url,) in rows]
+
     def add_items(self, items: list[NewItem]) -> int:
         """Insert Items whose URL is not stored yet; return how many were added."""
         added = 0
