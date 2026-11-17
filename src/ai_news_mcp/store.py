@@ -76,6 +76,12 @@ class StoredItem:
 
 
 @dataclass(frozen=True)
+class SearchMatches:
+    items: list[StoredItem]
+    total: int  # every match, including those not in `items`
+
+
+@dataclass(frozen=True)
 class SourceHealth:
     last_attempt_at: datetime
     last_success_at: datetime | None
@@ -233,15 +239,17 @@ class Store:
         categories: list[Category] | None,
         source_ids: list[str] | None,
         limit: int,
-    ) -> list[StoredItem]:
-        """Items matching every given filter, newest first; None means no such filter.
+    ) -> SearchMatches:
+        """The newest `limit` Items matching every given filter, newest first, plus every
+        other match published at the same time as the oldest of them; None means no such
+        filter.
 
         `query`: the title or summary contains it (ASCII case-insensitive).
         `since` / `until`: published at or after `since`, and before `until`.
         `categories` / `source_ids`: in any of them; an empty list matches nothing.
         """
         if categories == [] or source_ids == []:
-            return []
+            return SearchMatches(items=[], total=0)
         conditions: list[str] = []
         parameters: dict[str, object] = {"limit": limit}
         if query is not None:
@@ -265,17 +273,30 @@ class Store:
             names = _named_placeholders(parameters, "source", source_ids)
             conditions.append(f"source_id IN ({names})")
         where = " AND ".join(conditions) or "1"
+        # One statement, so that `total` counts the same matches the rows come from even
+        # while another server process sharing the store writes a collection.
         rows = self._db.execute(
             f"""
-            SELECT id, original_url, title, summary, published_at, source_id
-            FROM items
-            WHERE {where}
+            WITH matches AS (
+                SELECT id, original_url, title, summary, published_at, source_id,
+                    COUNT(*) OVER () AS total
+                FROM items
+                WHERE {where}
+            ),
+            cut AS (  -- the `limit`-th newest match; with fewer matches, none
+                SELECT published_at FROM matches
+                ORDER BY published_at DESC, id DESC
+                LIMIT 1 OFFSET :limit - 1
+            )
+            SELECT id, original_url, title, summary, published_at, source_id, total
+            FROM matches
+            WHERE published_at >= COALESCE((SELECT published_at FROM cut), '')
             ORDER BY published_at DESC, id DESC
-            LIMIT :limit
             """,
             parameters,
         ).fetchall()
-        return self._with_categories(rows)
+        total = rows[0][6] if rows else 0
+        return SearchMatches(items=self._with_categories([row[:6] for row in rows]), total=total)
 
     def collected_after(
         self, since: dict[Category, datetime | None], published_since: datetime

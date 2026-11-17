@@ -22,3 +22,6 @@ PYTHONWARNDEFAULTENCODING=1 uv run pytest
 build_dir=$(mktemp -d)
 trap 'rm -rf "$build_dir"' EXIT
 uv build --quiet --out-dir "$build_dir"
+
+# The last line says whether every stage passed, so `scripts/check | tail -1` is enough.
+echo "scripts/check: all checks passed"

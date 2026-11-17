@@ -14,6 +14,14 @@ A test that needs a collection to be running, or a request to have arrived, wait
 
 A tool's list parameter (for example `categories`, `sources`) means the default when omitted (`None`) and nothing when empty (`[]`). Flag code that treats the two alike, such as `if not categories:` or `categories or ALL`.
 
+## Paged results never split a publish time
+
+A tool that cuts its Items at `limit` shows every Item published at the time of the cut, or none of them (`shown_items`), and reports `more`. A client pages back with the oldest shown Item's `published_at` as the exclusive `until`, so a split leaves those Items out of every page. Flag a result cut by a plain SQL `LIMIT`, or one without `more`.
+
+## Untested paths come from a coverage run
+
+Before reporting a path in the diff as untested, run `uv run pytest --cov=ai_news_mcp --cov-branch --cov-report=term-missing` and report only lines and branches of the diff it lists as missed. Why: a path reads as untested when a test reaches it indirectly (a paging test's last page takes the fewer-than-`limit` path).
+
 ## Name things with the glossary's words
 
 Names of modules, classes, functions, variables, tool parameters and test cases, and the prose of tool descriptions and both READMEs, use the terms in `GLOSSARY.md`: Item, Source, Category, What's New, Checkpoint, and the Category names News, Applications, Engineering, Models. Flag any synonym the glossary lists under _Avoid_ (for example `article`, `feed` for a Source, `tag`, `digest`, `research`). A Source's own term for its raw data (an HN story, a sitemap URL) is fine inside that Source's adapter and tests, and where a doc describes that Source. A format's name (an RSS or Atom feed) is fine wherever it names the format.

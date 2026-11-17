@@ -161,6 +161,7 @@ def first_characters(text: str, length: int) -> tuple[str, bool]:
 
 class SearchResult(BaseModel):
     items: list[ItemView]
+    more: int = 0
 
 
 class FullText(BaseModel):
@@ -321,7 +322,10 @@ def create_server(
         offset, or a date alone (midnight), is UTC. `categories`: in any of them (News,
         Applications, Engineering, Models; see `whats_new`). `sources`: from any of these
         Source ids (see `list_sources`). An empty `categories` or `sources` list matches
-        nothing. Results are newest first, at most `limit` (default 20). A summary shown is
+        nothing. Results are newest first, up to `limit` (default 20); Items published at the
+        same time are never split, so a few more or fewer can be shown. `more` counts the
+        matching Items left out (0: none); for the next page, call again with the same
+        filters and `until` the oldest shown Item's `published_at`. A summary shown is
         plain text cut to `summary_length`, about 500 characters by default; a shorter
         length skims many Items by title, 0 shows none, and `read_item` gives the full text.
         Searching never moves a Checkpoint.
@@ -333,7 +337,7 @@ def create_server(
                     f"No Source has id {', '.join(map(repr, unknown))}. "
                     f"Known Source ids: {', '.join(sorted(known_source_ids))}."
                 )
-        items = store.search(
+        matches = store.search(
             query=query,
             since=as_utc(since),
             until=as_utc(until),
@@ -341,7 +345,11 @@ def create_server(
             source_ids=sources,
             limit=limit,
         )
-        return SearchResult(items=[ItemView.of(item, summary_length) for item in items])
+        shown = shown_items(matches.items, limit)
+        return SearchResult(
+            items=[ItemView.of(item, summary_length) for item in shown],
+            more=matches.total - len(shown),
+        )
 
     # Fetches the Item's page from its site but stores nothing.
     @tool(
