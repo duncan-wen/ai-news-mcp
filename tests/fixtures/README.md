@@ -33,3 +33,4 @@ To see the Items fixtures collect into, with their publish times, Categories (af
 | `techcrunch_rss.xml` | TechCrunch AI RSS | 2026-11-17 | 3 of 20 Items: 2 from 17 Nov 2026, 1 (Corma) from 16 Nov |
 | `techcrunch_rss_updated.xml` | TechCrunch AI RSS | 2026-11-17 | `techcrunch_rss.xml` with 2 hand edits: the Corma Item moved to a URL dated 18 Nov, with an 18 Nov pubDate, as TechCrunch does when an Item is updated |
 | `simon_willison_atom.xml` | Simon Willison Atom | 2026-11-11 | 2 of 30 Items, both with HTML summaries: 1 of 1,562 characters (10 Nov), 1 under 500 once its HTML is dropped (4 Nov) |
+| `product_hunt_atom.xml` | Product Hunt: AI Atom | 2026-11-18 | 3 of 50 Items: 2 from 16 Nov 2026, 1 from 3 Nov; each summary a tagline paragraph, then a "Discussion \| Link" paragraph |

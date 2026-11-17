@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xml:lang="en-US" xmlns="http://www.w3.org/2005/Atom">
+  <id>tag:www.producthunt.com,2005:/feed?category=artificial-intelligence</id>
+  <link rel="alternate" type="text/html" href="https://www.producthunt.com"/>
+  <link rel="self" type="application/atom+xml" href="https://www.producthunt.com/feed?category=artificial-intelligence"/>
+  <title>Product Hunt — The best new products, every day</title>
+  <updated>2026-11-17T00:01:00-08:00</updated>
+  <entry>
+    <id>tag:www.producthunt.com,2005:Post/1318477</id>
+    <published>2026-11-16T00:11:08-08:00</published>
+    <updated>2026-11-17T11:26:25-08:00</updated>
+    <link rel="alternate" type="text/html" href="https://www.producthunt.com/products/stencil-by-superhands"/>
+    <title>Superhands</title>
+    <content type="html">          &lt;p&gt;
+            Design the system, not every output.
+          &lt;/p&gt;
+          &lt;p&gt;
+            &lt;a href="https://www.producthunt.com/products/stencil-by-superhands?utm_campaign=producthunt-atom-posts-feed&amp;amp;utm_medium=rss-feed&amp;amp;utm_source=producthunt-atom-posts-feed"&gt;Discussion&lt;/a&gt;
+            |
+            &lt;a href="https://www.producthunt.com/r/p/1318477?app_id=339"&gt;Link&lt;/a&gt;
+          &lt;/p&gt;
+</content>
+    <author>
+      <name>Grant MacLennan</name>
+    </author>
+  </entry><entry>
+    <id>tag:www.producthunt.com,2005:Post/1318689</id>
+    <published>2026-11-16T02:54:15-08:00</published>
+    <updated>2026-11-17T10:44:32-08:00</updated>
+    <link rel="alternate" type="text/html" href="https://www.producthunt.com/products/pinecall"/>
+    <title>Pinecall</title>
+    <content type="html">          &lt;p&gt;
+            The open-source platform for voice AI agents
+          &lt;/p&gt;
+          &lt;p&gt;
+            &lt;a href="https://www.producthunt.com/products/pinecall?utm_campaign=producthunt-atom-posts-feed&amp;amp;utm_medium=rss-feed&amp;amp;utm_source=producthunt-atom-posts-feed"&gt;Discussion&lt;/a&gt;
+            |
+            &lt;a href="https://www.producthunt.com/r/p/1318689?app_id=339"&gt;Link&lt;/a&gt;
+          &lt;/p&gt;
+</content>
+    <author>
+      <name>Bernardo Castro</name>
+    </author>
+  </entry><entry>
+    <id>tag:www.producthunt.com,2005:Post/1303191</id>
+    <published>2026-11-03T08:19:13-08:00</published>
+    <updated>2026-11-17T10:34:06-08:00</updated>
+    <link rel="alternate" type="text/html" href="https://www.producthunt.com/products/trellus"/>
+    <title>Trellus</title>
+    <content type="html">          &lt;p&gt;
+            Power and parallel dial from the list already in your CRM
+          &lt;/p&gt;
+          &lt;p&gt;
+            &lt;a href="https://www.producthunt.com/products/trellus?utm_campaign=producthunt-atom-posts-feed&amp;amp;utm_medium=rss-feed&amp;amp;utm_source=producthunt-atom-posts-feed"&gt;Discussion&lt;/a&gt;
+            |
+            &lt;a href="https://www.producthunt.com/r/p/1303191?app_id=339"&gt;Link&lt;/a&gt;
+          &lt;/p&gt;
+</content>
+    <author>
+      <name>Garry Tan</name>
+    </author>
+  </entry>
+</feed>
