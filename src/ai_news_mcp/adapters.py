@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import calendar
 import json
+import re
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -28,6 +29,13 @@ class ParsedItem:
     published_at: datetime | None
 
 
+# Product Hunt's Atom feed ends each summary in a paragraph of two links, "Discussion |
+# Link", which carry nothing the Item's URL does not: the summary is the tagline before it.
+_PRODUCT_HUNT_LINKS = re.compile(
+    r"<p>\s*<a [^>]*>Discussion</a>\s*\|\s*<a [^>]*>Link</a>\s*</p>\s*\Z"
+)
+
+
 def parse_rss(body: bytes) -> list[ParsedItem]:
     """Parse an RSS or Atom document; raise FormatError if the body is neither."""
     parsed = feedparser.parse(body)
@@ -42,7 +50,7 @@ def parse_rss(body: bytes) -> list[ParsedItem]:
             ParsedItem(
                 url=url,
                 title=str(raw.get("title") or "").strip(),
-                summary=str(raw.get("summary") or "").strip(),
+                summary=_PRODUCT_HUNT_LINKS.sub("", str(raw.get("summary") or "")).strip(),
                 published_at=_publish_time(raw),
             )
         )

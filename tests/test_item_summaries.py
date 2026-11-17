@@ -72,3 +72,17 @@ async def test_search_with_summary_length_0_shows_no_summary(connect):
     [item] = result["items"]
     assert item["summary"] == ""
     assert item["title"] == "datasette-llm 0.1a10"
+
+
+async def test_a_product_hunt_summary_is_the_tagline_without_its_links(connect, fetcher):
+    product_hunt = first_version_source("product-hunt-ai")
+    fetcher.serve(product_hunt.url, "product_hunt_atom.xml")
+    async with connect((product_hunt,)) as client:
+        result = await search_collected(client)
+
+    summaries = {item["title"]: item["summary"] for item in result["items"]}
+    assert summaries == {
+        "Superhands": "Design the system, not every output.",
+        "Pinecall": "The open-source platform for voice AI agents",
+        "Trellus": "Power and parallel dial from the list already in your CRM",
+    }
