@@ -183,8 +183,9 @@ def parse_openrouter_models(body: bytes) -> list[ParsedItem]:
 
     A model links to its page and was published when it was listed (`created`); one
     without it is skipped, since it would count as new forever. A
-    variant (`:batch`, `:free`) listed beside its model is skipped: it is the same model.
-    A variant listed alone, such as a model only offered free, is kept.
+    variant (`:batch`, `:free`) listed beside its model is skipped: it is the same model,
+    and the model's own page is the one to keep. A variant listed alone, such as a model
+    only offered free, is kept here; the Collector drops it if its model is already stored.
     """
     try:
         models = json.loads(body)["data"]

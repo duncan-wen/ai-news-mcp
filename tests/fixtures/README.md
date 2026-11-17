@@ -29,4 +29,7 @@ To see the Items fixtures collect into, with their publish times, Categories (af
 | `hf_models.json` | Hugging Face models API, trending | 2026-11-11 | A top-level array, pretty-printed. 7 of 100 models: 5 created from 28 Oct to 7 Nov 2026, 1 from July 2026, 1 from Nov 2025; 1 with no `pipeline_tag` |
 | `hf_models_later.json` | Hugging Face models API, trending | 2026-11-11 | `hf_models.json` plus 2 models left out of it, standing in for models that started trending later: 1 created 14 Oct, 1 created 5 Nov |
 | `openrouter_models.json` | OpenRouter models API | 2026-11-11 | Pretty-printed. 7 of 469 models (`total_count` left as downloaded): Claude Fable 5.2 and its `:batch` variant, LFM3-1.7B and its `:free` variant, a `:free` variant listed alone, 1 from 28 Oct, 1 from 1 Sept 2026 |
+| `openrouter_models_variants_alone.json` | OpenRouter models API | 2026-11-11 | `openrouter_models.json` without Claude Fable 5.2 and LFM3-1.7B: their `:batch` and `:free` variants listed alone |
+| `techcrunch_rss.xml` | TechCrunch AI RSS | 2026-11-17 | 3 of 20 Items: 2 from 17 Nov 2026, 1 (Corma) from 16 Nov |
+| `techcrunch_rss_updated.xml` | TechCrunch AI RSS | 2026-11-17 | `techcrunch_rss.xml` with 2 hand edits: the Corma Item moved to a URL dated 18 Nov, with an 18 Nov pubDate, as TechCrunch does when an Item is updated |
 | `simon_willison_atom.xml` | Simon Willison Atom | 2026-11-11 | 2 of 30 Items, both with HTML summaries: 1 of 1,562 characters (10 Nov), 1 under 500 once its HTML is dropped (4 Nov) |
