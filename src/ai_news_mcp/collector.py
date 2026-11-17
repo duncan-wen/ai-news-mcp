@@ -98,16 +98,16 @@ class Collector:
             # A model trending months after it was created is not new, though created
             # after the backfill began.
             cutoff = max(cutoff, now - MODEL_NEW_FOR)
-        stored = {same_item_key(url, source) for url in self._store.item_urls(source.id)}
+        seen_keys = {same_item_key(url, source) for url in self._store.item_urls(source.id)}
         new_items: list[NewItem] = []
         for parsed in parsed_items:
             published_at = parsed.published_at or now
             url = normalize_url(parsed.url)
             key = same_item_key(url, source)
             # An Item listed again under another URL adds nothing: the first one is kept.
-            if published_at < cutoff or key in stored:
+            if published_at < cutoff or key in seen_keys:
                 continue
-            stored.add(key)
+            seen_keys.add(key)
             new_items.append(
                 NewItem(
                     url=url,
