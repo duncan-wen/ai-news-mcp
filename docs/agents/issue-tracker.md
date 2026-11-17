@@ -29,9 +29,10 @@ When set to `yes`, PRs run through the same labels and states as issues, using t
 
 GitHub shares one number space across issues and PRs, so a bare `#42` may be either: resolve with `gh pr view 42` and fall back to `gh issue view 42`.
 
-## Waiting on CI and Dependabot
+## Waiting on CI, merging, and Dependabot
 
-- **Wait on CI**: `gh pr checks <n> --watch` for a PR, `gh run watch <run-id> --exit-status` for a run. A check still running reports an empty `conclusion`, so a hand-written poll that reads `.conclusion // .status` stops early.
+- **Wait on CI**: `gh pr checks <n> --watch` for a PR, `gh run watch <run-id> --exit-status` for a run. Run it in the background and report green or red when it exits: watching CI is the agent's job, not the user's. A check still running reports an empty `conclusion`, so a hand-written poll that reads `.conclusion // .status` stops early.
+- **Merge**: `gh pr merge <n> --squash`, once every check passes. The squash commit's subject defaults to the PR title plus `(#n)`, and GitHub deletes the remote branch.
 - **Just pushed**: checks take a few seconds to register, and `--watch` exits at once with "no checks reported" until they do. Retry it until it lists them.
 - **A job that a skipped job feeds**: give its `if:` a status function (`!cancelled() && !failure() && ...`). Without one, the job skips whenever a job in its `needs` chain skipped (publish.yml's `download`).
 - **Merge as each turns green**: Dependabot PRs are independent; merge each when its checks pass rather than waiting on the batch.
