@@ -2,10 +2,13 @@
 
 Notable changes in each release. Versions follow [Semantic Versioning](https://semver.org/); until 1.0.0, a minor version can change the tools or the `sources.toml` format.
 
-## Unreleased
+## 0.3.0
 
 - `whats_new` takes `summary_length` to shorten the summaries it shows (0: none), as `search` does.
 - `whats_new` shows up to 60 Items by default instead of 100, so a default call fits under Claude Code's 50,000-character tool-result threshold.
+- `search` never splits Items published at the same time across pages, and reports `more`, how many matching Items were left out. Page back with `until` the oldest shown Item's `published_at`.
+- A collection keeps one Item when its Source lists it again under a new URL: a TechCrunch update under a new date, or an OpenRouter variant (`:free`, `:batch`) of a stored model. Items already stored twice stay.
+- Product Hunt summaries leave out the "Discussion | Link" line after the tagline. Items already stored keep their summaries.
 
 ## 0.2.1
 
