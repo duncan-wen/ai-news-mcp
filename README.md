@@ -101,7 +101,7 @@ Run **MCP: Open User Configuration** from the Command Palette and add it under `
 
 ### Other MCP clients
 
-Every client starts it the same way: the command is `uvx ai-news-mcp`, over stdio, with no arguments, environment variables or API key; from a clone, it is `uv run --directory /path/to/ai-news-mcp ai-news-mcp`. If a client cannot find `uvx`, give its full path as the command (the output of `which uvx`, or `where uvx` on Windows).
+Every client starts it the same way: the command is `uvx ai-news-mcp`, over stdio, with no arguments, environment variables or API key; from a clone, it is `uv run --directory /path/to/ai-news-mcp ai-news-mcp`. If a client cannot find `uvx`, give its full path as the command (the output of `which uvx`, or `where uvx` on Windows). A new release runs the next time the client starts the server: `uvx` caches PyPI's answer for 10 minutes, then picks up the new version by itself.
 
 ## Tools
 

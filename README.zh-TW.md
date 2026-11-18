@@ -99,7 +99,7 @@ claude mcp add --scope user ai-news -- uv run --directory /path/to/ai-news-mcp a
 
 ### 其他 MCP client
 
-每個 client 都用同樣方式啟動：指令是 `uvx ai-news-mcp`，透過 stdio 溝通，不需要參數、環境變數或 API key；從 clone 執行的話，指令是 `uv run --directory /path/to/ai-news-mcp ai-news-mcp`。如果 client 找不到 `uvx`，就把它的完整路徑寫成指令（`which uvx` 的輸出，Windows 上是 `where uvx`）。
+每個 client 都用同樣方式啟動：指令是 `uvx ai-news-mcp`，透過 stdio 溝通，不需要參數、環境變數或 API key；從 clone 執行的話，指令是 `uv run --directory /path/to/ai-news-mcp ai-news-mcp`。如果 client 找不到 `uvx`，就把它的完整路徑寫成指令（`which uvx` 的輸出，Windows 上是 `where uvx`）。新版會在 client 下次啟動 server 時自動使用：`uvx` 會快取 PyPI 的回應 10 分鐘，之後就會自己換成新版。
 
 ## Tools（工具）
 
