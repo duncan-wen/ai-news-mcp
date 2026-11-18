@@ -74,6 +74,43 @@ async def test_search_with_summary_length_0_shows_no_summary(connect):
     assert item["title"] == "datasette-llm 0.1a10"
 
 
+async def test_whats_new_cuts_summaries_to_the_summary_length_asked_for(connect):
+    async with connect((SIMON_WILLISON,)) as client:
+        result = await call(client, "whats_new", summary_length=40)
+
+    [item] = [i for i in result["items"] if i["title"] == "Quoting Prompting Claude Fable 5.2"]
+    assert item["summary"] == "Claude Fable 5.2 responds closely to wha…"
+
+
+async def test_whats_new_with_summary_length_0_shows_no_summary(connect):
+    async with connect((SIMON_WILLISON,)) as client:
+        result = await call(client, "whats_new", summary_length=0)
+
+    assert [(item["title"], item["summary"]) for item in result["items"]] == [
+        ("Quoting Prompting Claude Fable 5.2", ""),
+        ("datasette-llm 0.1a10", ""),
+    ]
+
+
+@pytest.mark.parametrize("summary_length", [0, 40, 500])
+async def test_whats_new_shows_the_same_items_whatever_the_summary_length(connect, summary_length):
+    async with connect((SIMON_WILLISON,)) as client:
+        first = await call(client, "whats_new", limit=1, summary_length=summary_length)
+        second = await call(client, "whats_new")
+
+    assert [item["title"] for item in first["items"]] == ["Quoting Prompting Claude Fable 5.2"]
+    assert first["more"] == 1
+    assert second["items"] == []
+
+
+@pytest.mark.parametrize("tool", ["search", "whats_new"])
+async def test_a_negative_summary_length_is_rejected(connect, tool):
+    async with connect((SIMON_WILLISON,)) as client:
+        error = await call_error(client, tool, summary_length=-1)
+
+    assert "summary_length" in error
+
+
 async def test_a_product_hunt_summary_is_the_tagline_without_its_links(connect, fetcher):
     product_hunt = first_version_source("product-hunt-ai")
     fetcher.serve(product_hunt.url, "product_hunt_atom.xml")

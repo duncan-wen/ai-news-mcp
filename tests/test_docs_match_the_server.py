@@ -97,7 +97,8 @@ async def test_tool_descriptions_give_the_shown_summary_length(connect, tool):
 
 
 @pytest.mark.parametrize(
-    ("tool", "parameter"), [("search", "summary_length"), ("read_item", "max_length")]
+    ("tool", "parameter"),
+    [("search", "summary_length"), ("whats_new", "summary_length"), ("read_item", "max_length")],
 )
 @pytest.mark.parametrize("language", READMES)
 async def test_readme_and_description_give_each_length_default(connect, language, tool, parameter):
