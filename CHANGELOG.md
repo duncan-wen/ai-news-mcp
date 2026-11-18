@@ -2,6 +2,11 @@
 
 Notable changes in each release. Versions follow [Semantic Versioning](https://semver.org/); until 1.0.0, a minor version can change the tools or the `sources.toml` format.
 
+## Unreleased
+
+- `whats_new` takes `summary_length` to shorten the summaries it shows (0: none), as `search` does.
+- `whats_new` shows up to 60 Items by default instead of 100, so a default call fits under Claude Code's 50,000-character tool-result threshold.
+
 ## 0.2.1
 
 - Every tool sets the four MCP annotation hints (`readOnlyHint`, `destructiveHint`, `idempotentHint`, `openWorldHint`): `list_sources`, `search` and `read_item` are read-only; `collect_now` and `whats_new` only add or move state, never delete.

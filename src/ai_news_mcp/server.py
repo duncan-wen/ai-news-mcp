@@ -33,9 +33,10 @@ from .store import SourceHealth, Store, StoredItem
 
 SEARCH_LIMIT = 20
 WHATS_NEW_LOOKBACK = timedelta(days=7)
-# About 46,000 characters: under the 50,000 at which Claude Code writes a tool result to a
-# file instead of showing it.
-WHATS_NEW_LIMIT = 100
+# Measured on a real store, an Item with a 500-character summary takes about 560 to 615
+# characters of the result, so 60 come to about 37,000: under the 50,000 at which Claude
+# Code writes a tool result to a file instead of showing it.
+WHATS_NEW_LIMIT = 60
 # The rest of a summary is one `read_item` away. The tool descriptions say "about 500".
 SHOWN_SUMMARY_LENGTH = 500
 # About 2,500 tokens: enough to check what a page claims; a client asks for more by name.
@@ -408,6 +409,7 @@ def create_server(
     async def whats_new(
         categories: list[Category] | None = None,
         limit: Annotated[int, Field(ge=1)] = WHATS_NEW_LIMIT,
+        summary_length: Annotated[int, Field(ge=0)] = SHOWN_SUMMARY_LENGTH,
     ) -> WhatsNew:
         """What's New: Items collected since the last Checkpoint and published in the last 7 days.
 
@@ -422,11 +424,13 @@ def create_server(
         call (null: never viewed). If `items` is empty, tell the user when they last looked
         and offer `search` for recently published Items.
 
-        Results are newest first, up to `limit` (default 100); Items published at the same
+        Results are newest first, up to `limit` (default 60); Items published at the same
         time are never split, so a few more or fewer can be shown. `more` counts the Items
         left out; they count as seen too, so tell the user and offer `search` with the same
         `categories`, `since` 7 days ago and `until` the oldest shown Item's `published_at`.
-        Summaries are plain text cut to about 500 characters; `read_item` gives the full text.
+        A summary shown is plain text cut to `summary_length`, about 500 characters by
+        default; a shorter length skims many Items by title, 0 shows none, and `read_item`
+        gives the full text.
 
         Categories (an Item can be in several):
         News: Events in the AI industry, such as launches, funding, policy, and people
@@ -461,7 +465,7 @@ def create_server(
         return WhatsNew(
             warning=failing_sources_warning(sources, store.source_health()),
             previous_checkpoints=previous,
-            items=[ItemView.of(item) for item in shown],
+            items=[ItemView.of(item, summary_length) for item in shown],
             more=len(items) - len(shown),
             note=note,
         )
