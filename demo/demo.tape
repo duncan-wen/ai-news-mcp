@@ -13,11 +13,11 @@ Set Padding 12
 Set Framerate 20
 Set TypingSpeed 40ms
 
-# whats_new can return more than Claude Code's default MCP output limit, which saves it to a
-# file that Claude then reads with Bash: an approval prompt that eats the next question and
-# a path that shows the home directory. A higher limit and no Bash keep to the three tools.
+# Claude Code's default MCP output limit, as users have it: since 0.3.0 a default whats_new
+# fits under it. No Bash keeps to the three tools; a tool result saved to a file would need
+# Bash to read, an approval prompt that eats the next question.
 Hide
-Type "cd /tmp/ai-news-demo && clear && MAX_MCP_OUTPUT_TOKENS=100000 claude --strict-mcp-config --mcp-config mcp.json --setting-sources project --permission-mode default --allowedTools mcp__ai-news --disallowedTools Bash --append-system-prompt '用繁體中文回答。'" Enter
+Type "cd /tmp/ai-news-demo && clear && claude --strict-mcp-config --mcp-config mcp.json --setting-sources project --permission-mode default --allowedTools mcp__ai-news --disallowedTools Bash --append-system-prompt '用繁體中文回答。'" Enter
 Sleep 4s
 # A new directory asks for folder trust, defaulting to "No, exit": pick "Yes". Once the
 # folder is trusted there is no prompt, and Down then Enter on an empty input does nothing.
